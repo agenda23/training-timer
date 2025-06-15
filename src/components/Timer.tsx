@@ -155,22 +155,22 @@ export default function Timer() {
   }, [isRunning, isPaused, updateTimer]);
 
   useEffect(() => {
-    const handleKeyPress = (e: KeyboardEvent) => {
-      if (e.code === 'Space') {
-        e.preventDefault();
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.code === 'Space') {
+        event.preventDefault()
         if (isRunning) {
-          pauseTimer();
+          pauseTimer()
         } else {
-          startTimer();
+          startTimer()
         }
-      } else if (e.code === 'Escape') {
-        resetTimer();
       }
-    };
+    }
 
-    window.addEventListener('keydown', handleKeyPress);
-    return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [isRunning]);
+    document.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [isRunning, pauseTimer, startTimer])
 
   const formatTime = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);
