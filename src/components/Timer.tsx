@@ -26,6 +26,49 @@ const DEFAULT_SETTINGS: TimerSettings = {
   soundEnabled: true,
 };
 
+const SettingInput = ({ 
+  label, 
+  value, 
+  onChange, 
+  min, 
+  max, 
+  unit = "秒"
+}: {
+  label: string;
+  value: number;
+  onChange: (value: number) => void;
+  min: number;
+  max: number;
+  unit?: string;
+}) => (
+  <div className="bg-white/10 p-3 rounded-xl shadow-lg border border-white/20">
+    <label className="block text-sm sm:text-base mb-2 font-medium text-white tracking-wide">
+      {label}
+    </label>
+    <div className="flex items-center gap-3">
+      <input
+        type="range"
+        value={value}
+        onChange={(e) => onChange(parseInt(e.target.value))}
+        className="w-full h-2 bg-white/20 rounded-lg appearance-none cursor-pointer accent-white/90"
+        min={min}
+        max={max}
+      />
+      <div className="w-20 flex items-center gap-1 bg-white/10 rounded-lg p-1 backdrop-blur-sm">
+        <input
+          type="number"
+          value={value}
+          onChange={(e) => onChange(parseInt(e.target.value) || min)}
+          className="w-12 p-1 rounded bg-transparent text-white text-center font-medium"
+          min={min}
+          max={max}
+        />
+        <span className="text-sm text-white/90">{unit}</span>
+      </div>
+    </div>
+  </div>
+);
+
 export default function Timer() {
   const [settings, setSettings] = useState<TimerSettings>(DEFAULT_SETTINGS);
   const [isRunning, setIsRunning] = useState(false);
@@ -133,61 +176,18 @@ export default function Timer() {
 
   const progress = (currentTime / (isResting ? settings.intervalTime : settings.setTime)) * 100;
 
-  const SettingInput = ({ 
-    label, 
-    value, 
-    onChange, 
-    min, 
-    max, 
-    unit = "秒"
-  }: {
-    label: string;
-    value: number;
-    onChange: (value: number) => void;
-    min: number;
-    max: number;
-    unit?: string;
-  }) => (
-    <div className="bg-white/10 p-3 rounded-xl shadow-lg border border-white/20">
-      <label className="block text-sm sm:text-base mb-2 font-medium text-white tracking-wide">
-        {label}
-      </label>
-      <div className="flex items-center gap-3">
-        <input
-          type="range"
-          value={value}
-          onChange={(e) => onChange(parseInt(e.target.value))}
-          className="w-full h-2 bg-white/20 rounded-lg appearance-none cursor-pointer accent-white/90"
-          min={min}
-          max={max}
-        />
-        <div className="w-20 flex items-center gap-1 bg-white/10 rounded-lg p-1 backdrop-blur-sm">
-          <input
-            type="number"
-            value={value}
-            onChange={(e) => onChange(parseInt(e.target.value) || min)}
-            className="w-12 p-1 rounded bg-transparent text-white text-center font-medium"
-            min={min}
-            max={max}
-          />
-          <span className="text-sm text-white/90">{unit}</span>
-        </div>
-      </div>
-    </div>
-  );
-
   return (
     <div className={`w-full min-h-[100dvh] flex items-center justify-center ${
       isResting ? 'bg-gradient-to-br from-green-400 to-green-600' : 'bg-gradient-to-br from-red-400 to-red-600'
     } ${isFullscreen ? 'fixed inset-0 z-50' : ''}`}>
-      <div className="w-full max-w-md sm:max-w-lg lg:max-w-xl relative py-6 px-4">
-        <div className="flex flex-col gap-4 sm:gap-6">
+      <div className="w-full max-w-md sm:max-w-lg lg:max-w-xl relative py-4 px-4">
+        <div className="flex flex-col gap-3 sm:gap-4">
           <div className="text-center text-white">
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight drop-shadow-lg">
               {isResting ? '休憩中' : 'トレーニング中'}
             </h1>
           </div>
-          <div className="flex flex-col items-center gap-3 sm:gap-4">
+          <div className="flex flex-col items-center gap-2 sm:gap-3">
             <div className="text-5xl sm:text-6xl lg:text-7xl font-mono text-white font-bold tracking-wider drop-shadow-lg">
               {formatTime(currentTime)}
             </div>
@@ -202,8 +202,8 @@ export default function Timer() {
             </div>
           </div>
           {!isRunning ? (
-            <div className="mt-4 sm:mt-6">
-              <div className="bg-white/10 p-4 rounded-2xl backdrop-blur-md shadow-xl space-y-3 border border-white/20">
+            <div className="mt-3 sm:mt-4">
+              <div className="bg-white/10 p-3 rounded-2xl backdrop-blur-md shadow-xl space-y-3 border border-white/20">
                 <SettingInput
                   label="セット時間"
                   value={settings.setTime}
@@ -245,7 +245,7 @@ export default function Timer() {
               </div>
             </div>
           ) : null}
-          <div className="flex justify-center space-x-4 mt-4 sm:mt-6">
+          <div className="flex justify-center space-x-4 mt-3 sm:mt-4">
             <button
               onClick={isRunning ? pauseTimer : startTimer}
               className="bg-white/90 text-gray-800 rounded-full p-3 hover:bg-white hover:scale-105 transition-all duration-300 shadow-lg backdrop-blur-sm"
