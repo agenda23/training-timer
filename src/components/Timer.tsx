@@ -1,30 +1,14 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import screenfull from 'screenfull';
-import useSound from 'use-sound';
-import {
-  PlayIcon,
-  PauseIcon,
-  ArrowPathIcon,
-  ArrowsPointingOutIcon,
-  SpeakerWaveIcon,
-  SpeakerXMarkIcon,
-} from '@heroicons/react/24/solid';
 
 interface TimerSettings {
-  setTime: number;
-  intervalTime: number;
+  workTime: number;
+  restTime: number;
   setCount: number;
-  soundEnabled: boolean;
 }
 
-const DEFAULT_SETTINGS: TimerSettings = {
-  setTime: 30,
-  intervalTime: 15,
-  setCount: 3,
-  soundEnabled: true,
-};
+type TimerPhase = 'work' | 'rest' | 'complete';
 
 const SettingInput = ({ 
   label, 
@@ -43,67 +27,138 @@ const SettingInput = ({
   unit?: string;
   step?: number;
 }) => (
-  <div className="bg-white/10 p-3 rounded-xl shadow-lg border border-white/20">
-    <label className="block text-sm sm:text-base mb-2 font-medium text-white tracking-wide">
+  <div 
+    style={{
+      backgroundColor: 'rgba(255, 255, 255, 0.1)',
+      padding: '0.75rem',
+      borderRadius: '0.75rem',
+      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+      border: '1px solid rgba(255, 255, 255, 0.2)'
+    }}
+  >
+    <label 
+      style={{
+        display: 'block',
+        fontSize: '1rem',
+        marginBottom: '0.5rem',
+        fontWeight: '500',
+        color: 'white',
+        letterSpacing: '0.025em'
+      }}
+    >
       {label}
     </label>
-    <div className="flex items-center gap-3">
+    <div 
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.75rem'
+      }}
+    >
       <input
         type="range"
         value={value}
         onChange={(e) => onChange(parseInt(e.target.value))}
-        className="w-full h-2 bg-white/20 rounded-lg appearance-none cursor-pointer accent-white/90"
+        style={{
+          width: '100%',
+          height: '8px',
+          backgroundColor: 'rgba(255, 255, 255, 0.2)',
+          borderRadius: '0.5rem',
+          appearance: 'none',
+          cursor: 'pointer',
+          accentColor: 'rgba(255, 255, 255, 0.9)'
+        }}
         min={min}
         max={max}
         step={step}
       />
-      <div className="w-20 flex items-center gap-1 bg-white/10 rounded-lg p-1 backdrop-blur-sm">
+      <div 
+        style={{
+          width: '80px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.25rem',
+          backgroundColor: 'rgba(255, 255, 255, 0.1)',
+          borderRadius: '0.5rem',
+          padding: '0.25rem',
+          backdropFilter: 'blur(4px)'
+        }}
+      >
         <input
           type="number"
           value={value}
           onChange={(e) => onChange(parseInt(e.target.value) || min)}
-          className="w-12 p-1 rounded bg-transparent text-white text-center font-medium"
+          style={{
+            width: '48px',
+            padding: '0.25rem',
+            borderRadius: '0.25rem',
+            backgroundColor: 'transparent',
+            color: 'white',
+            textAlign: 'center',
+            fontWeight: '500',
+            border: 'none',
+            outline: 'none'
+          }}
           min={min}
           max={max}
           step={step}
         />
-        <span className="text-sm text-white/90">{unit}</span>
+        <span 
+          style={{
+            fontSize: '0.875rem',
+            color: 'rgba(255, 255, 255, 0.9)'
+          }}
+        >
+          {unit}
+        </span>
       </div>
     </div>
   </div>
 );
 
+const ProgressBar = ({ progress }: { progress: number }) => (
+  <div 
+    style={{
+      width: '100%',
+      backgroundColor: 'rgba(255, 255, 255, 0.1)',
+      borderRadius: '9999px',
+      height: '0.75rem',
+      overflow: 'hidden',
+      boxShadow: 'inset 0 2px 4px rgba(0, 0, 0, 0.1)',
+      border: '1px solid rgba(255, 255, 255, 0.2)'
+    }}
+  >
+    <div
+      style={{
+        height: '100%',
+        background: 'linear-gradient(90deg, rgba(34, 197, 94, 0.9) 0%, rgba(59, 130, 246, 0.9) 100%)',
+        borderRadius: '9999px',
+        transition: 'width 0.3s ease-in-out',
+        width: `${progress}%`,
+        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)'
+      }}
+    />
+  </div>
+);
+
 export default function Timer() {
-  const [settings, setSettings] = useState<TimerSettings>(DEFAULT_SETTINGS);
+  const [settings, setSettings] = useState<TimerSettings>({
+    workTime: 45,
+    restTime: 15,
+    setCount: 8
+  });
+
+  const [timeLeft, setTimeLeft] = useState(settings.workTime);
+  const [currentSet, setCurrentSet] = useState(1);
+  const [phase, setPhase] = useState<TimerPhase>('work');
   const [isRunning, setIsRunning] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [currentSet, setCurrentSet] = useState(1);
-  const [isResting, setIsResting] = useState(false);
-  const [isFullscreen, setIsFullscreen] = useState(false);
-
-  const [playStart] = useSound('/sounds/start.mp3', { 
-    volume: 0.5,
-    soundEnabled: settings.soundEnabled 
-  });
-  const [playEnd] = useSound('/sounds/end.mp3', { 
-    volume: 0.5,
-    soundEnabled: settings.soundEnabled 
-  });
-
-  const toggleFullscreen = () => {
-    if (screenfull.isEnabled) {
-      screenfull.toggle();
-      setIsFullscreen(!isFullscreen);
-    }
-  };
 
   const startTimer = () => {
     if (!isRunning) {
       setIsRunning(true);
       setIsPaused(false);
-      setCurrentTime(settings.setTime);
-      if (settings.soundEnabled) playStart();
+      setTimeLeft(settings.workTime);
     }
   };
 
@@ -114,37 +169,29 @@ export default function Timer() {
   const resetTimer = () => {
     setIsRunning(false);
     setIsPaused(false);
-    setCurrentTime(0);
+    setTimeLeft(settings.workTime);
     setCurrentSet(1);
-    setIsResting(false);
+    setPhase('work');
   };
 
   const updateTimer = useCallback(() => {
-    if (currentTime > 0) {
-      setCurrentTime(currentTime - 1);
+    if (timeLeft > 0) {
+      setTimeLeft(timeLeft - 1);
     } else {
-      if (isResting) {
-        setIsResting(false);
+      if (phase === 'work') {
+        setPhase('rest');
+        setTimeLeft(settings.restTime);
+      } else {
+        setPhase('complete');
         setCurrentSet(currentSet + 1);
         if (currentSet < settings.setCount) {
-          setCurrentTime(settings.setTime);
-          if (settings.soundEnabled) playStart();
+          setTimeLeft(settings.workTime);
         } else {
           setIsRunning(false);
-          if (settings.soundEnabled) playEnd();
-        }
-      } else {
-        if (currentSet < settings.setCount) {
-          setIsResting(true);
-          setCurrentTime(settings.intervalTime);
-          if (settings.soundEnabled) playEnd();
-        } else {
-          setIsRunning(false);
-          if (settings.soundEnabled) playEnd();
         }
       }
     }
-  }, [currentTime, currentSet, isResting, settings, playStart, playEnd]);
+  }, [timeLeft, currentSet, settings.workTime, settings.restTime, settings.setCount, phase]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -178,103 +225,150 @@ export default function Timer() {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const progress = (currentTime / (isResting ? settings.intervalTime : settings.setTime)) * 100;
+  const progress = (timeLeft / settings.workTime) * 100;
 
   return (
-    <div className={`fixed inset-0 w-full h-[100dvh] flex items-center justify-center overflow-hidden ${
-      isResting ? 'bg-gradient-to-br from-green-400 to-green-600' : 'bg-gradient-to-br from-red-400 to-red-600'
-    } ${isFullscreen ? 'z-50' : ''}`}>
-      <div className="w-full h-[85dvh] max-w-md sm:max-w-lg lg:max-w-xl relative px-4">
-        <div className="flex flex-col justify-between h-full">
-          <div className="text-center text-white pt-4">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight drop-shadow-lg">
-              {isResting ? '休憩中' : 'トレーニング中'}
-            </h1>
+    <div 
+      className={`w-full min-h-screen flex flex-col items-center justify-center p-4 ${
+        phase === 'rest' ? 'bg-gradient-to-br from-green-400 to-green-600' : 'bg-gradient-to-br from-red-400 to-red-600'
+      }`}
+      style={{
+        background: phase === 'rest' 
+          ? 'linear-gradient(135deg, #34d399 0%, #059669 100%)' 
+          : 'linear-gradient(135deg, #f87171 0%, #dc2626 100%)'
+      }}
+    >
+      <div className="w-full max-w-md space-y-8">
+        {/* タイトル */}
+        <div className="text-center">
+          <h1 
+            className="text-3xl font-bold text-white drop-shadow-lg"
+            style={{ fontSize: '2rem', fontWeight: 'bold', color: 'white', textShadow: '0 4px 6px rgba(0, 0, 0, 0.3)' }}
+          >
+            {phase === 'rest' ? '休憩中' : 'トレーニング中'}
+          </h1>
+        </div>
+        
+        {/* タイマー表示 */}
+        <div className="text-center space-y-4">
+          <div 
+            className="text-6xl font-mono font-bold text-white drop-shadow-lg"
+            style={{ fontSize: '4rem', fontFamily: 'monospace', fontWeight: 'bold', color: 'white', textShadow: '0 4px 6px rgba(0, 0, 0, 0.3)' }}
+          >
+            {formatTime(timeLeft)}
           </div>
-          <div className="flex flex-col items-center gap-2 sm:gap-3">
-            <div className="text-5xl sm:text-6xl lg:text-7xl font-mono text-white font-bold tracking-wider drop-shadow-lg">
-              {formatTime(currentTime)}
-            </div>
-            <div className="text-lg sm:text-xl lg:text-2xl text-white font-medium tracking-wide drop-shadow-lg">
-              セット: {currentSet}/{settings.setCount}
-            </div>
-            <div className="w-full bg-white/20 rounded-full h-2.5 sm:h-3 lg:h-4 backdrop-blur-sm shadow-lg">
-              <div
-                className="bg-white/90 h-full rounded-full transition-all duration-1000 shadow-inner"
-                style={{ width: `${progress}%` }}
-              />
-            </div>
+          <div 
+            className="text-xl text-white font-medium"
+            style={{ fontSize: '1.25rem', color: 'white', fontWeight: '500' }}
+          >
+            セット: {currentSet}/{settings.setCount}
           </div>
-          {!isRunning ? (
-            <div className="w-full">
-              <div className="bg-white/10 p-3 rounded-2xl backdrop-blur-md shadow-xl space-y-3 border border-white/20">
-                <SettingInput
-                  label="セット時間"
-                  value={settings.setTime}
-                  onChange={(value) => setSettings({ ...settings, setTime: value })}
-                  min={10}
-                  max={600}
-                  step={10}
-                />
-                <SettingInput
-                  label="インターバル時間"
-                  value={settings.intervalTime}
-                  onChange={(value) => setSettings({ ...settings, intervalTime: value })}
-                  min={0}
-                  max={600}
-                  step={5}
-                />
-                <SettingInput
-                  label="セット数"
-                  value={settings.setCount}
-                  onChange={(value) => setSettings({ ...settings, setCount: value })}
-                  min={1}
-                  max={20}
-                  unit="回"
-                />
-                <button
-                  onClick={() => setSettings({ ...settings, soundEnabled: !settings.soundEnabled })}
-                  className="w-full bg-white/10 p-3 rounded-xl flex items-center justify-center gap-2 hover:bg-white/20 transition-all duration-300 text-white border border-white/20 shadow-lg"
-                >
-                  {settings.soundEnabled ? (
-                    <>
-                      <SpeakerWaveIcon className="h-5 w-5" />
-                      <span className="text-sm sm:text-base font-medium">サウンドON</span>
-                    </>
-                  ) : (
-                    <>
-                      <SpeakerXMarkIcon className="h-5 w-5" />
-                      <span className="text-sm sm:text-base font-medium">サウンドOFF</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-          ) : null}
-          <div className="flex justify-center space-x-4 pb-4">
-            <button
-              onClick={isRunning ? pauseTimer : startTimer}
-              className="bg-white/90 text-gray-800 rounded-full p-3 hover:bg-white hover:scale-105 transition-all duration-300 shadow-lg backdrop-blur-sm"
-            >
-              {isRunning && !isPaused ? (
-                <PauseIcon className="h-8 w-8" />
-              ) : (
-                <PlayIcon className="h-8 w-8" />
-              )}
-            </button>
-            <button
-              onClick={resetTimer}
-              className="bg-white/90 text-gray-800 rounded-full p-3 hover:bg-white hover:scale-105 transition-all duration-300 shadow-lg backdrop-blur-sm"
-            >
-              <ArrowPathIcon className="h-8 w-8" />
-            </button>
-            <button
-              onClick={toggleFullscreen}
-              className="hidden sm:block bg-white/90 text-gray-800 rounded-full p-3 hover:bg-white hover:scale-105 transition-all duration-300 shadow-lg backdrop-blur-sm"
-            >
-              <ArrowsPointingOutIcon className="h-8 w-8" />
-            </button>
+          <ProgressBar progress={progress} />
+        </div>
+
+        {/* 設定項目（タイマー停止時のみ表示） */}
+        {!isRunning && (
+          <div 
+            className="space-y-4 p-4 rounded-2xl"
+            style={{
+              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              backdropFilter: 'blur(10px)',
+              borderRadius: '1rem',
+              padding: '1rem',
+              border: '1px solid rgba(255, 255, 255, 0.2)'
+            }}
+          >
+            <SettingInput
+              label="ワーク時間"
+              value={settings.workTime}
+              onChange={(value) => setSettings({ ...settings, workTime: value })}
+              min={10}
+              max={600}
+              step={10}
+            />
+            <SettingInput
+              label="レスト時間"
+              value={settings.restTime}
+              onChange={(value) => setSettings({ ...settings, restTime: value })}
+              min={0}
+              max={600}
+              step={5}
+            />
+            <SettingInput
+              label="セット数"
+              value={settings.setCount}
+              onChange={(value) => setSettings({ ...settings, setCount: value })}
+              min={1}
+              max={20}
+              unit="回"
+            />
           </div>
+        )}
+
+        {/* コントロールボタン */}
+        <div 
+          style={{
+            display: 'flex',
+            gap: '1rem',
+            justifyContent: 'center',
+            flexWrap: 'wrap'
+          }}
+        >
+          <button
+            onClick={isRunning ? pauseTimer : startTimer}
+            style={{
+              padding: '0.75rem 2rem',
+              borderRadius: '9999px',
+              fontWeight: '600',
+              fontSize: '1.125rem',
+              color: 'white',
+              background: isRunning 
+                ? 'linear-gradient(135deg, rgba(239, 68, 68, 0.9) 0%, rgba(220, 38, 38, 0.9) 100%)'
+                : 'linear-gradient(135deg, rgba(34, 197, 94, 0.9) 0%, rgba(22, 163, 74, 0.9) 100%)',
+              border: 'none',
+              cursor: 'pointer',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
+              transition: 'all 0.2s ease-in-out',
+              minWidth: '120px'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow = '0 6px 16px rgba(0, 0, 0, 0.4)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.3)';
+            }}
+          >
+            {isRunning ? '一時停止' : 'スタート'}
+          </button>
+          
+          <button
+            onClick={resetTimer}
+            style={{
+              padding: '0.75rem 2rem',
+              borderRadius: '9999px',
+              fontWeight: '600',
+              fontSize: '1.125rem',
+              color: 'white',
+              background: 'linear-gradient(135deg, rgba(107, 114, 128, 0.9) 0%, rgba(75, 85, 99, 0.9) 100%)',
+              border: 'none',
+              cursor: 'pointer',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
+              transition: 'all 0.2s ease-in-out',
+              minWidth: '120px'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow = '0 6px 16px rgba(0, 0, 0, 0.4)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.3)';
+            }}
+          >
+            リセット
+          </button>
         </div>
       </div>
     </div>
