@@ -148,8 +148,8 @@ export default function Timer() {
     max: number;
     unit?: string;
   }) => (
-    <div className="bg-white/10 p-4 rounded-xl shadow-lg border border-white/20">
-      <label className="block text-sm sm:text-base lg:text-lg mb-2 font-medium text-white tracking-wide">
+    <div className="bg-white/10 p-3 rounded-xl shadow-lg border border-white/20">
+      <label className="block text-sm sm:text-base mb-2 font-medium text-white tracking-wide">
         {label}
       </label>
       <div className="flex items-center gap-3">
@@ -161,12 +161,12 @@ export default function Timer() {
           min={min}
           max={max}
         />
-        <div className="w-24 flex items-center gap-1 bg-white/10 rounded-lg p-1 backdrop-blur-sm">
+        <div className="w-20 flex items-center gap-1 bg-white/10 rounded-lg p-1 backdrop-blur-sm">
           <input
             type="number"
             value={value}
             onChange={(e) => onChange(parseInt(e.target.value) || min)}
-            className="w-14 p-1 rounded bg-transparent text-white text-center font-medium"
+            className="w-12 p-1 rounded bg-transparent text-white text-center font-medium"
             min={min}
             max={max}
           />
@@ -177,24 +177,24 @@ export default function Timer() {
   );
 
   return (
-    <div className={`w-full min-h-[100dvh] flex items-center justify-center p-4 ${
+    <div className={`w-full min-h-[100dvh] flex items-center justify-center ${
       isResting ? 'bg-gradient-to-br from-green-400 to-green-600' : 'bg-gradient-to-br from-red-400 to-red-600'
     } ${isFullscreen ? 'fixed inset-0 z-50' : ''}`}>
-      <div className="w-full max-w-7xl aspect-[3/4] sm:aspect-[4/3] relative">
-        <div className="absolute inset-0 flex flex-col justify-between p-4 sm:p-6">
-          <div className="flex-none text-center text-white">
-            <h1 className="text-2xl sm:text-4xl lg:text-6xl font-bold tracking-tight drop-shadow-lg">
+      <div className="w-full max-w-md sm:max-w-lg lg:max-w-xl relative py-6 px-4">
+        <div className="flex flex-col gap-4 sm:gap-6">
+          <div className="text-center text-white">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight drop-shadow-lg">
               {isResting ? '休憩中' : 'トレーニング中'}
             </h1>
           </div>
-          <div className="flex-1 flex flex-col justify-center items-center gap-4 sm:gap-6 lg:gap-8 my-2 sm:my-4">
-            <div className="text-4xl sm:text-6xl lg:text-8xl font-mono text-white font-bold tracking-wider drop-shadow-lg">
+          <div className="flex flex-col items-center gap-3 sm:gap-4">
+            <div className="text-5xl sm:text-6xl lg:text-7xl font-mono text-white font-bold tracking-wider drop-shadow-lg">
               {formatTime(currentTime)}
             </div>
-            <div className="text-xl sm:text-2xl lg:text-4xl text-white font-medium tracking-wide drop-shadow-lg">
+            <div className="text-lg sm:text-xl lg:text-2xl text-white font-medium tracking-wide drop-shadow-lg">
               セット: {currentSet}/{settings.setCount}
             </div>
-            <div className="w-full max-w-4xl bg-white/20 rounded-full h-3 sm:h-4 lg:h-6 backdrop-blur-sm shadow-lg">
+            <div className="w-full bg-white/20 rounded-full h-2.5 sm:h-3 lg:h-4 backdrop-blur-sm shadow-lg">
               <div
                 className="bg-white/90 h-full rounded-full transition-all duration-1000 shadow-inner"
                 style={{ width: `${progress}%` }}
@@ -202,8 +202,8 @@ export default function Timer() {
             </div>
           </div>
           {!isRunning ? (
-            <div className="flex-none w-full max-w-2xl mx-auto">
-              <div className="bg-white/10 p-4 sm:p-6 rounded-2xl backdrop-blur-md shadow-xl space-y-3 sm:space-y-4 border border-white/20">
+            <div className="mt-4 sm:mt-6">
+              <div className="bg-white/10 p-4 rounded-2xl backdrop-blur-md shadow-xl space-y-3 border border-white/20">
                 <SettingInput
                   label="セット時間"
                   value={settings.setTime}
@@ -245,28 +245,28 @@ export default function Timer() {
               </div>
             </div>
           ) : null}
-          <div className="flex-none flex justify-center space-x-4 mt-4">
+          <div className="flex justify-center space-x-4 mt-4 sm:mt-6">
             <button
               onClick={isRunning ? pauseTimer : startTimer}
-              className="bg-white/90 text-gray-800 rounded-full p-3 sm:p-4 hover:bg-white hover:scale-105 transition-all duration-300 shadow-lg backdrop-blur-sm"
+              className="bg-white/90 text-gray-800 rounded-full p-3 hover:bg-white hover:scale-105 transition-all duration-300 shadow-lg backdrop-blur-sm"
             >
               {isRunning && !isPaused ? (
-                <PauseIcon className="h-6 w-6 sm:h-8 sm:w-8 lg:h-10 lg:w-10" />
+                <PauseIcon className="h-8 w-8" />
               ) : (
-                <PlayIcon className="h-6 w-6 sm:h-8 sm:w-8 lg:h-10 lg:w-10" />
+                <PlayIcon className="h-8 w-8" />
               )}
             </button>
             <button
               onClick={resetTimer}
-              className="bg-white/90 text-gray-800 rounded-full p-3 sm:p-4 hover:bg-white hover:scale-105 transition-all duration-300 shadow-lg backdrop-blur-sm"
+              className="bg-white/90 text-gray-800 rounded-full p-3 hover:bg-white hover:scale-105 transition-all duration-300 shadow-lg backdrop-blur-sm"
             >
-              <ArrowPathIcon className="h-6 w-6 sm:h-8 sm:w-8 lg:h-10 lg:w-10" />
+              <ArrowPathIcon className="h-8 w-8" />
             </button>
             <button
               onClick={toggleFullscreen}
-              className="bg-white/90 text-gray-800 rounded-full p-3 sm:p-4 hover:bg-white hover:scale-105 transition-all duration-300 shadow-lg backdrop-blur-sm"
+              className="bg-white/90 text-gray-800 rounded-full p-3 hover:bg-white hover:scale-105 transition-all duration-300 shadow-lg backdrop-blur-sm"
             >
-              <ArrowsPointingOutIcon className="h-6 w-6 sm:h-8 sm:w-8 lg:h-10 lg:w-10" />
+              <ArrowsPointingOutIcon className="h-8 w-8" />
             </button>
           </div>
         </div>
