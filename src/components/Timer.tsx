@@ -32,7 +32,8 @@ const SettingInput = ({
   onChange, 
   min, 
   max, 
-  unit = "秒"
+  unit = "秒",
+  step = 1
 }: {
   label: string;
   value: number;
@@ -40,6 +41,7 @@ const SettingInput = ({
   min: number;
   max: number;
   unit?: string;
+  step?: number;
 }) => (
   <div className="bg-white/10 p-3 rounded-xl shadow-lg border border-white/20">
     <label className="block text-sm sm:text-base mb-2 font-medium text-white tracking-wide">
@@ -53,6 +55,7 @@ const SettingInput = ({
         className="w-full h-2 bg-white/20 rounded-lg appearance-none cursor-pointer accent-white/90"
         min={min}
         max={max}
+        step={step}
       />
       <div className="w-20 flex items-center gap-1 bg-white/10 rounded-lg p-1 backdrop-blur-sm">
         <input
@@ -62,6 +65,7 @@ const SettingInput = ({
           className="w-12 p-1 rounded bg-transparent text-white text-center font-medium"
           min={min}
           max={max}
+          step={step}
         />
         <span className="text-sm text-white/90">{unit}</span>
       </div>
@@ -208,8 +212,9 @@ export default function Timer() {
                   label="セット時間"
                   value={settings.setTime}
                   onChange={(value) => setSettings({ ...settings, setTime: value })}
-                  min={1}
+                  min={10}
                   max={600}
+                  step={10}
                 />
                 <SettingInput
                   label="インターバル時間"
@@ -217,6 +222,7 @@ export default function Timer() {
                   onChange={(value) => setSettings({ ...settings, intervalTime: value })}
                   min={0}
                   max={600}
+                  step={5}
                 />
                 <SettingInput
                   label="セット数"
