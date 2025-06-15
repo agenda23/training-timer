@@ -8,6 +8,10 @@
   "background_color": "#ffffff",
   "theme_color": "#ef4444",
   "prefer_related_applications": false,
+  "scope": "/",
+  "lang": "ja",
+  "dir": "ltr",
+  "categories": ["health", "fitness", "sports"],
   "icons": [
     {
       "src": "/icons/icon-72x72.png",
@@ -55,7 +59,15 @@
       "src": "/icons/icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any"
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "narrow"
     }
   ]
 } 

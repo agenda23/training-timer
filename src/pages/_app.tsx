@@ -3,6 +3,7 @@ import type { AppProps } from 'next/app'
 import Head from 'next/head'
 import { Inter } from 'next/font/google'
 import { Navigation } from '@/components/Navigation'
+import { PWAInstallPrompt } from '@/components/PWAInstallPrompt'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -12,6 +13,7 @@ export default function App({ Component, pageProps }: AppProps) {
       <Head>
         <title>トレーニングタイマー</title>
       </Head>
+      <PWAInstallPrompt />
       <div className="min-h-screen pb-16 touch-none">
         <Component {...pageProps} />
       </div>
