@@ -17,6 +17,60 @@
   "edge_side_panel": {
     "preferred_width": 400
   },
+  "shortcuts": [
+    {
+      "name": "アプリを更新",
+      "short_name": "更新",
+      "description": "アプリを最新版に更新します",
+      "url": "/?action=update",
+      "icons": [
+        {
+          "src": "/icons/icon-96x96.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "クイックスタート",
+      "short_name": "開始",
+      "description": "すぐにトレーニングを開始します",
+      "url": "/?action=start",
+      "icons": [
+        {
+          "src": "/icons/icon-96x96.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "設定",
+      "short_name": "設定",
+      "description": "タイマー設定を変更します",
+      "url": "/?action=settings",
+      "icons": [
+        {
+          "src": "/icons/icon-96x96.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "PWA診断",
+      "short_name": "診断",
+      "description": "PWAの状態を確認します",
+      "url": "/?action=status",
+      "icons": [
+        {
+          "src": "/icons/icon-96x96.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
   "icons": [
     {
       "src": "/icons/icon-72x72.png",

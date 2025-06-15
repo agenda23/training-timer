@@ -6,7 +6,7 @@ interface ManifestData {
   icons?: Array<{ src: string; sizes: string; type: string }>
 }
 
-interface PWAStatus {
+interface PWAStatusData {
   isHTTPS: boolean
   hasServiceWorker: boolean
   hasManifest: boolean
@@ -21,14 +21,36 @@ interface SafariNavigator extends Navigator {
   standalone?: boolean
 }
 
-export const PWAStatus = () => {
-  const [status, setStatus] = useState<PWAStatus | null>(null)
+interface PWAStatusProps {
+  forceShow?: boolean
+  onClose?: () => void
+}
+
+export const PWAStatus = ({ forceShow = false, onClose }: PWAStatusProps = {}) => {
+  const [pwaData, setPwaData] = useState<PWAStatusData | null>(null)
   const [showStatus, setShowStatus] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [isReloading, setIsReloading] = useState(false)
+  const [updateAvailable, setUpdateAvailable] = useState(false)
 
   useEffect(() => {
     setMounted(true)
   }, [])
+
+  // forceShowが変更されたときの処理
+  useEffect(() => {
+    if (forceShow) {
+      setShowStatus(true)
+    }
+  }, [forceShow])
+
+  // ダイアログを閉じる処理
+  const handleClose = () => {
+    setShowStatus(false)
+    if (onClose) {
+      onClose()
+    }
+  }
 
   useEffect(() => {
     if (!mounted) return
@@ -80,7 +102,7 @@ export const PWAStatus = () => {
           serviceWorkerStatus
         }
 
-        setStatus(statusData)
+        setPwaData(statusData)
       } catch (error) {
         console.error('Error checking PWA status:', error)
       }
@@ -89,8 +111,95 @@ export const PWAStatus = () => {
     checkPWAStatus()
   }, [mounted])
 
+  // Service Workerの更新を監視
+  useEffect(() => {
+    if (!mounted || typeof navigator === 'undefined' || !('serviceWorker' in navigator)) return
+
+    const checkForUpdates = async () => {
+      try {
+        const registration = await navigator.serviceWorker.getRegistration()
+        if (registration) {
+          // 更新をチェック
+          registration.addEventListener('updatefound', () => {
+            const newWorker = registration.installing
+            if (newWorker) {
+              newWorker.addEventListener('statechange', () => {
+                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                  setUpdateAvailable(true)
+                }
+              })
+            }
+          })
+
+          // 既に待機中のService Workerがある場合
+          if (registration.waiting) {
+            setUpdateAvailable(true)
+          }
+
+          // 定期的に更新をチェック
+          await registration.update()
+        }
+      } catch (error) {
+        console.error('Service Worker update check failed:', error)
+      }
+    }
+
+    checkForUpdates()
+    
+    // 5分ごとに更新をチェック
+    const interval = setInterval(checkForUpdates, 5 * 60 * 1000)
+    
+    return () => clearInterval(interval)
+  }, [mounted])
+
+  // PWAリロード機能
+  const handlePWAReload = async () => {
+    setIsReloading(true)
+    setUpdateAvailable(false) // 更新状態をリセット
+    
+    try {
+      // Service Workerの更新を強制
+      if ('serviceWorker' in navigator) {
+        const registration = await navigator.serviceWorker.getRegistration()
+        if (registration) {
+          await registration.update()
+          
+          // 新しいService Workerがある場合は強制的にアクティベート
+          if (registration.waiting) {
+            registration.waiting.postMessage({ type: 'SKIP_WAITING' })
+          }
+        }
+      }
+
+      // キャッシュをクリア
+      if ('caches' in window) {
+        const cacheNames = await caches.keys()
+        await Promise.all(
+          cacheNames.map(cacheName => caches.delete(cacheName))
+        )
+      }
+
+      // 少し待ってからリロード
+      setTimeout(() => {
+        window.location.reload()
+      }, 500)
+      
+    } catch (error) {
+      console.error('PWA reload failed:', error)
+      setIsReloading(false)
+      setUpdateAvailable(false)
+      // エラーが発生した場合でも通常のリロードを実行
+      window.location.reload()
+    }
+  }
+
+  // 通常のリロード
+  const handleNormalReload = () => {
+    window.location.reload()
+  }
+
   // サーバーサイドレンダリング時は何も表示しない
-  if (!mounted || !status) {
+  if (!mounted || !pwaData) {
     return null
   }
 
@@ -104,7 +213,7 @@ export const PWAStatus = () => {
           top: '8px',
           right: '8px',
           zIndex: 9999,
-          backgroundColor: '#3b82f6',
+          backgroundColor: updateAvailable ? '#f59e0b' : '#3b82f6',
           color: 'white',
           fontSize: '12px',
           padding: '6px 10px',
@@ -113,13 +222,28 @@ export const PWAStatus = () => {
           cursor: 'pointer',
           fontWeight: '500',
           opacity: 0.8,
-          transition: 'opacity 0.2s'
+          transition: 'all 0.2s'
         }}
         onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
         onMouseLeave={(e) => e.currentTarget.style.opacity = '0.8'}
-        title="PWA Status"
+        title={updateAvailable ? "PWA Status - 更新利用可能!" : "PWA Status"}
       >
-        PWA
+        PWA {updateAvailable && '🔄'}
+        {updateAvailable && (
+          <span
+            style={{
+              position: 'absolute',
+              top: '-2px',
+              right: '-2px',
+              width: '8px',
+              height: '8px',
+              backgroundColor: '#ef4444',
+              borderRadius: '50%',
+              border: '1px solid white',
+              display: 'inline-block'
+            }}
+          />
+        )}
       </button>
 
       {showStatus && (
@@ -137,7 +261,7 @@ export const PWAStatus = () => {
             zIndex: 10000,
             padding: '20px'
           }}
-          onClick={() => setShowStatus(false)}
+          onClick={handleClose}
         >
           <div 
             style={{
@@ -154,7 +278,7 @@ export const PWAStatus = () => {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
               <h3 style={{ fontSize: '20px', fontWeight: 'bold', margin: 0, color: '#1f2937' }}>PWA診断</h3>
               <button
-                onClick={() => setShowStatus(false)}
+                onClick={handleClose}
                 style={{
                   background: 'none',
                   border: 'none',
@@ -171,58 +295,65 @@ export const PWAStatus = () => {
             <div style={{ fontSize: '14px', lineHeight: '1.6', color: '#374151' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', padding: '8px 0', borderBottom: '1px solid #f3f4f6' }}>
                 <span><strong>HTTPS配信:</strong></span>
-                <span style={{ color: status.isHTTPS ? '#059669' : '#dc2626' }}>
-                  {status.isHTTPS ? '✅ Yes' : '❌ No'}
+                <span style={{ color: pwaData.isHTTPS ? '#059669' : '#dc2626' }}>
+                  {pwaData.isHTTPS ? '✅ Yes' : '❌ No'}
                 </span>
               </div>
               
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', padding: '8px 0', borderBottom: '1px solid #f3f4f6' }}>
                 <span><strong>Service Worker:</strong></span>
-                <span style={{ color: status.hasServiceWorker ? '#059669' : '#dc2626' }}>
-                  {status.hasServiceWorker ? '✅ Yes' : '❌ No'}
+                <span style={{ color: pwaData.hasServiceWorker ? '#059669' : '#dc2626' }}>
+                  {pwaData.hasServiceWorker ? '✅ Yes' : '❌ No'}
                 </span>
               </div>
               
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', padding: '8px 0', borderBottom: '1px solid #f3f4f6' }}>
                 <span><strong>SW Status:</strong></span>
                 <span style={{ fontSize: '12px', color: '#6b7280' }}>
-                  {status.serviceWorkerStatus}
+                  {pwaData.serviceWorkerStatus}
                 </span>
               </div>
               
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', padding: '8px 0', borderBottom: '1px solid #f3f4f6' }}>
                 <span><strong>Manifest:</strong></span>
-                <span style={{ color: status.hasManifest ? '#059669' : '#dc2626' }}>
-                  {status.hasManifest ? '✅ Yes' : '❌ No'}
+                <span style={{ color: pwaData.hasManifest ? '#059669' : '#dc2626' }}>
+                  {pwaData.hasManifest ? '✅ Yes' : '❌ No'}
                 </span>
               </div>
               
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', padding: '8px 0', borderBottom: '1px solid #f3f4f6' }}>
                 <span><strong>PWAモード:</strong></span>
-                <span style={{ color: status.isPWA ? '#059669' : '#f59e0b' }}>
-                  {status.isPWA ? '✅ PWAとして起動中' : '⚠️ ブラウザモード'}
+                <span style={{ color: pwaData.isPWA ? '#059669' : '#f59e0b' }}>
+                  {pwaData.isPWA ? '✅ PWAとして起動中' : '⚠️ ブラウザモード'}
                 </span>
               </div>
               
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px', padding: '8px 0' }}>
                 <span><strong>インストール可能:</strong></span>
-                <span style={{ color: status.isInstallable ? '#059669' : '#f59e0b' }}>
-                  {status.isInstallable ? '✅ Yes' : '⚠️ No'}
+                <span style={{ color: pwaData.isInstallable ? '#059669' : '#f59e0b' }}>
+                  {pwaData.isInstallable ? '✅ Yes' : '⚠️ No'}
                 </span>
               </div>
 
-              {status.manifestData && (
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px', padding: '8px 0' }}>
+                <span><strong>更新状態:</strong></span>
+                <span style={{ color: updateAvailable ? '#f59e0b' : '#059669' }}>
+                  {updateAvailable ? '🔄 更新利用可能' : '✅ 最新版'}
+                </span>
+              </div>
+
+              {pwaData.manifestData && (
                 <div style={{ marginTop: '20px', padding: '16px', backgroundColor: '#f9fafb', borderRadius: '8px', border: '1px solid #e5e7eb' }}>
                   <div style={{ fontSize: '14px', fontWeight: '600', marginBottom: '8px', color: '#374151' }}>Manifest設定:</div>
                   <div style={{ fontSize: '13px', color: '#6b7280', lineHeight: '1.5' }}>
-                    <div>Display: {status.manifestData.display}</div>
-                    <div>Start URL: {status.manifestData.start_url}</div>
-                    <div>Icons: {status.manifestData.icons?.length || 0}個</div>
+                    <div>Display: {pwaData.manifestData.display}</div>
+                    <div>Start URL: {pwaData.manifestData.start_url}</div>
+                    <div>Icons: {pwaData.manifestData.icons?.length || 0}個</div>
                   </div>
                 </div>
               )}
               
-              {status.userAgent.includes('iPhone') && (
+              {pwaData.userAgent.includes('iPhone') && (
                 <div style={{ 
                   marginTop: '20px', 
                   padding: '16px', 
@@ -242,7 +373,7 @@ export const PWAStatus = () => {
                 </div>
               )}
 
-              {!status.isPWA && status.userAgent.includes('Chrome') && (
+              {!pwaData.isPWA && pwaData.userAgent.includes('Chrome') && (
                 <div style={{ 
                   marginTop: '20px', 
                   padding: '16px', 
@@ -258,6 +389,71 @@ export const PWAStatus = () => {
                   </div>
                 </div>
               )}
+            </div>
+
+            {/* リロードボタン */}
+            <div style={{ 
+              marginTop: '24px', 
+              paddingTop: '20px', 
+              borderTop: '1px solid #e5e7eb',
+              display: 'flex',
+              gap: '12px',
+              justifyContent: 'center'
+            }}>
+              <button
+                onClick={handlePWAReload}
+                disabled={isReloading}
+                style={{
+                  backgroundColor: '#3b82f6',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '10px 20px',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  cursor: isReloading ? 'not-allowed' : 'pointer',
+                  opacity: isReloading ? 0.6 : 1,
+                  transition: 'all 0.2s',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}
+                onMouseEnter={(e) => {
+                  if (!isReloading) {
+                    e.currentTarget.style.backgroundColor = '#2563eb'
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isReloading) {
+                    e.currentTarget.style.backgroundColor = '#3b82f6'
+                  }
+                }}
+              >
+                {isReloading ? '🔄' : '🔄'} PWAリロード
+              </button>
+              
+              <button
+                onClick={handleNormalReload}
+                style={{
+                  backgroundColor: '#6b7280',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '10px 20px',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#4b5563'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = '#6b7280'
+                }}
+              >
+                🔄 通常リロード
+              </button>
             </div>
           </div>
         </div>

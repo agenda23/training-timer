@@ -174,6 +174,89 @@ export default function Timer() {
   const [phase, setPhase] = useState<TimerPhase>('work');
   const [isRunning, setIsRunning] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
+  const [showPWAStatus, setShowPWAStatus] = useState(false);
+
+  // URLパラメータからアクションを処理
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
+    const urlParams = new URLSearchParams(window.location.search);
+    const action = urlParams.get('action');
+    
+    if (action) {
+      // URLパラメータをクリア
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, '', newUrl);
+      
+      // アクションを実行
+      switch (action) {
+        case 'update':
+          handlePWAUpdate();
+          break;
+        case 'start':
+          handleQuickStart();
+          break;
+        case 'settings':
+          // 設定パネルは停止中のみ表示されるので、停止状態にする
+          if (isRunning) {
+            setIsRunning(false);
+            setIsPaused(false);
+          }
+          break;
+        case 'status':
+          setShowPWAStatus(true);
+          break;
+      }
+    }
+  }, []);
+
+  // PWA更新処理
+  const handlePWAUpdate = async () => {
+    try {
+      // Service Workerの更新を強制
+      if ('serviceWorker' in navigator) {
+        const registration = await navigator.serviceWorker.getRegistration();
+        if (registration) {
+          await registration.update();
+          
+          // 新しいService Workerがある場合は強制的にアクティベート
+          if (registration.waiting) {
+            registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+          }
+        }
+      }
+
+      // キャッシュをクリア
+      if ('caches' in window) {
+        const cacheNames = await caches.keys();
+        await Promise.all(
+          cacheNames.map(cacheName => caches.delete(cacheName))
+        );
+      }
+
+      // 少し待ってからリロード
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
+      
+    } catch (error) {
+      console.error('PWA update failed:', error);
+      // エラーが発生した場合でも通常のリロードを実行
+      window.location.reload();
+    }
+  };
+
+  // クイックスタート処理
+  const handleQuickStart = () => {
+    if (!isRunning) {
+      setIsRunning(true);
+      setIsPaused(false);
+      setTimeLeft(settings.workTime);
+      setCurrentSet(1);
+      setPhase('work');
+      playStartSound();
+    }
+  };
 
   // 音声機能
   const playSound = useCallback((frequency: number, duration: number = 200) => {
@@ -316,7 +399,10 @@ export default function Timer() {
           zIndex: 1000
         }}
       >
-        <PWAStatus />
+        <PWAStatus 
+          forceShow={showPWAStatus} 
+          onClose={() => setShowPWAStatus(false)} 
+        />
       </div>
 
       {/* タイトル */}
