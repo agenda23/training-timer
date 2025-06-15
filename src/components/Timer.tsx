@@ -181,12 +181,12 @@ export default function Timer() {
   const progress = (currentTime / (isResting ? settings.intervalTime : settings.setTime)) * 100;
 
   return (
-    <div className={`w-full min-h-[100vh] flex items-center justify-center ${
+    <div className={`w-full min-h-[100dvh] flex items-center justify-center ${
       isResting ? 'bg-gradient-to-br from-green-400 to-green-600' : 'bg-gradient-to-br from-red-400 to-red-600'
     } ${isFullscreen ? 'fixed inset-0 z-50' : ''}`}>
-      <div className="w-full h-full max-w-md sm:max-w-lg lg:max-w-xl relative py-4 px-4">
-        <div className="flex flex-col justify-center min-h-[100vh] gap-3 sm:gap-4">
-          <div className="text-center text-white">
+      <div className="w-full h-[85dvh] max-w-md sm:max-w-lg lg:max-w-xl relative px-4">
+        <div className="flex flex-col justify-between h-full">
+          <div className="text-center text-white pt-4">
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight drop-shadow-lg">
               {isResting ? '休憩中' : 'トレーニング中'}
             </h1>
@@ -206,7 +206,7 @@ export default function Timer() {
             </div>
           </div>
           {!isRunning ? (
-            <div className="mt-3 sm:mt-4">
+            <div className="w-full">
               <div className="bg-white/10 p-3 rounded-2xl backdrop-blur-md shadow-xl space-y-3 border border-white/20">
                 <SettingInput
                   label="セット時間"
@@ -251,7 +251,7 @@ export default function Timer() {
               </div>
             </div>
           ) : null}
-          <div className="flex justify-center space-x-4 mt-3 sm:mt-4">
+          <div className="flex justify-center space-x-4 pb-4">
             <button
               onClick={isRunning ? pauseTimer : startTimer}
               className="bg-white/90 text-gray-800 rounded-full p-3 hover:bg-white hover:scale-105 transition-all duration-300 shadow-lg backdrop-blur-sm"
