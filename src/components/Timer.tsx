@@ -32,9 +32,9 @@ const SettingInput = ({
   <div 
     style={{
       backgroundColor: 'rgba(255, 255, 255, 0.15)',
-      padding: '1rem',
-      borderRadius: '0.75rem',
-      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
+      padding: '0.75rem',
+      borderRadius: '0.5rem',
+      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)',
       border: '1px solid rgba(255, 255, 255, 0.3)',
       backdropFilter: 'blur(10px)'
     }}
@@ -42,8 +42,8 @@ const SettingInput = ({
     <label 
       style={{
         display: 'block',
-        fontSize: '1rem',
-        marginBottom: '0.75rem',
+        fontSize: '0.875rem',
+        marginBottom: '0.5rem',
         fontWeight: '600',
         color: 'white',
         letterSpacing: '0.025em'
@@ -55,7 +55,7 @@ const SettingInput = ({
       style={{
         display: 'flex',
         alignItems: 'center',
-        gap: '0.75rem'
+        gap: '0.5rem'
       }}
     >
       <input
@@ -64,9 +64,9 @@ const SettingInput = ({
         onChange={(e) => onChange(parseInt(e.target.value))}
         style={{
           width: '100%',
-          height: '8px',
+          height: '6px',
           backgroundColor: 'rgba(255, 255, 255, 0.3)',
-          borderRadius: '0.5rem',
+          borderRadius: '0.375rem',
           appearance: 'none',
           cursor: 'pointer',
           accentColor: 'rgba(255, 255, 255, 0.9)'
@@ -77,12 +77,12 @@ const SettingInput = ({
       />
       <div 
         style={{
-          width: '80px',
+          width: '70px',
           display: 'flex',
           alignItems: 'center',
           gap: '0.25rem',
           backgroundColor: 'rgba(255, 255, 255, 0.2)',
-          borderRadius: '0.5rem',
+          borderRadius: '0.375rem',
           padding: '0.25rem',
           backdropFilter: 'blur(4px)',
           border: '1px solid rgba(255, 255, 255, 0.2)'
@@ -93,7 +93,7 @@ const SettingInput = ({
           value={value}
           onChange={(e) => onChange(parseInt(e.target.value) || min)}
           style={{
-            width: '50px',
+            width: '45px',
             padding: '0.125rem',
             borderRadius: '0.25rem',
             backgroundColor: 'transparent',
@@ -102,7 +102,7 @@ const SettingInput = ({
             fontWeight: '600',
             border: 'none',
             outline: 'none',
-            fontSize: '0.875rem'
+            fontSize: '0.75rem'
           }}
           min={min}
           max={max}
@@ -110,7 +110,7 @@ const SettingInput = ({
         />
         <span 
           style={{
-            fontSize: '0.75rem',
+            fontSize: '0.7rem',
             color: 'rgba(255, 255, 255, 0.9)',
             fontWeight: '500'
           }}
@@ -128,9 +128,9 @@ const ProgressBar = ({ progress }: { progress: number }) => (
       width: '100%',
       backgroundColor: 'rgba(255, 255, 255, 0.2)',
       borderRadius: '9999px',
-      height: '0.75rem',
+      height: '0.5rem',
       overflow: 'hidden',
-      boxShadow: 'inset 0 2px 4px rgba(0, 0, 0, 0.2), 0 2px 4px rgba(0, 0, 0, 0.1)',
+      boxShadow: 'inset 0 1px 2px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.1)',
       border: '1px solid rgba(255, 255, 255, 0.3)',
       backdropFilter: 'blur(4px)'
     }}
@@ -142,7 +142,7 @@ const ProgressBar = ({ progress }: { progress: number }) => (
         borderRadius: '9999px',
         transition: 'width 0.5s ease-in-out',
         width: `${progress}%`,
-        boxShadow: '0 1px 4px rgba(0, 0, 0, 0.3)',
+        boxShadow: '0 1px 2px rgba(0, 0, 0, 0.3)',
         position: 'relative'
       }}
     >
@@ -377,26 +377,34 @@ export default function Timer() {
     <div 
       style={{
         width: '100%',
-        minHeight: '100vh',
+        height: '100dvh',
         display: 'flex',
-        flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'flex-start',
-        padding: '1rem 0.5rem',
+        justifyContent: 'center',
         background: phase === 'rest' 
           ? 'linear-gradient(135deg, #34d399 0%, #059669 100%)' 
           : 'linear-gradient(135deg, #f87171 0%, #dc2626 100%)',
-        gap: '1.5rem',
-        overflowY: 'auto'
+        position: 'relative'
       }}
     >
       {/* PWAステータス */}
       <div 
         style={{
-          position: 'fixed',
-          top: '0.5rem',
-          right: '0.5rem',
-          zIndex: 1000
+          position: 'absolute',
+          top: '10px',
+          right: '10px',
+          zIndex: 1000,
+          opacity: 0.3,
+          transition: 'opacity 0.3s ease',
+          transform: 'scale(0.8)'
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.opacity = '0.8';
+          e.currentTarget.style.transform = 'scale(0.9)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.opacity = '0.3';
+          e.currentTarget.style.transform = 'scale(0.8)';
         }}
       >
         <PWAStatus 
@@ -405,233 +413,257 @@ export default function Timer() {
         />
       </div>
 
-      {/* タイトル */}
-      <div 
-        style={{
-          textAlign: 'center',
-          marginTop: '2rem'
-        }}
-      >
-        <h1 
-          style={{ 
-            fontSize: 'clamp(1.5rem, 5vw, 2rem)', 
-            fontWeight: 'bold', 
-            color: 'white', 
-            textShadow: '0 4px 6px rgba(0, 0, 0, 0.3)',
-            margin: '0',
-            letterSpacing: '0.05em'
-          }}
-        >
-          {phase === 'rest' ? '休憩中' : 'トレーニング中'}
-        </h1>
-      </div>
-
-      {/* タイマー表示 */}
-      <div 
-        style={{
-          textAlign: 'center'
-        }}
-      >
-        <div 
-          style={{ 
-            fontSize: 'clamp(3rem, 12vw, 4rem)', 
-            fontFamily: 'monospace', 
-            fontWeight: 'bold', 
-            color: 'white', 
-            textShadow: '0 4px 6px rgba(0, 0, 0, 0.3)',
-            margin: '0 0 0.5rem 0',
-            lineHeight: '1'
-          }}
-        >
-          {formatTime(timeLeft)}
-        </div>
-        <div 
-          style={{ 
-            fontSize: 'clamp(1rem, 3vw, 1.25rem)', 
-            color: 'rgba(255, 255, 255, 0.9)', 
-            fontWeight: '500',
-            margin: '0'
-          }}
-        >
-          セット: {currentSet}/{settings.setCount}
-        </div>
-      </div>
-
-      {/* プログレスバー */}
+      {/* メインコンテンツ */}
       <div 
         style={{
           width: '100%',
-          maxWidth: '350px',
-          padding: '0 1rem'
+          height: '80dvh',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '1rem 0.5rem',
+          overflowY: 'auto',
+          maxWidth: '400px'
         }}
       >
-        <ProgressBar progress={progress} />
-      </div>
-
-      {/* 設定 (停止中のみ表示) */}
-      {!isRunning && (
+        {/* 上部コンテンツ */}
         <div 
           style={{
             display: 'flex',
             flexDirection: 'column',
+            alignItems: 'center',
             gap: '1rem',
-            width: '100%',
-            maxWidth: '400px',
-            padding: '0 1rem'
+            flex: '1',
+            justifyContent: 'center',
+            maxWidth: '100%'
           }}
         >
-          <SettingInput
-            label="ワーク時間"
-            value={settings.workTime}
-            onChange={(value) => setSettings(prev => ({ ...prev, workTime: value }))}
-            min={10}
-            max={300}
-            unit="秒"
-            step={5}
-          />
-          <SettingInput
-            label="レスト時間"
-            value={settings.restTime}
-            onChange={(value) => setSettings(prev => ({ ...prev, restTime: value }))}
-            min={5}
-            max={180}
-            unit="秒"
-            step={5}
-          />
-          <SettingInput
-            label="セット数"
-            value={settings.setCount}
-            onChange={(value) => setSettings(prev => ({ ...prev, setCount: value }))}
-            min={1}
-            max={20}
-            unit="セット"
-            step={1}
-          />
-          
-          {/* 音声設定 */}
-          <div 
-            style={{
-              backgroundColor: 'rgba(255, 255, 255, 0.15)',
-              padding: '1rem',
-              borderRadius: '0.75rem',
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
-              border: '1px solid rgba(255, 255, 255, 0.3)',
-              backdropFilter: 'blur(10px)'
+          {/* タイトル */}
+          <h1 
+            style={{ 
+              fontSize: 'clamp(1.25rem, 4vw, 1.75rem)', 
+              fontWeight: 'bold', 
+              color: 'white', 
+              textShadow: '0 4px 6px rgba(0, 0, 0, 0.3)',
+              margin: '0',
+              letterSpacing: '0.05em',
+              textAlign: 'center'
             }}
           >
-            <label 
-              style={{
-                display: 'block',
-                fontSize: '1rem',
-                marginBottom: '0.75rem',
-                fontWeight: '600',
-                color: 'white',
-                letterSpacing: '0.025em'
+            {phase === 'rest' ? '休憩中' : 'トレーニング中'}
+          </h1>
+
+          {/* タイマー表示 */}
+          <div 
+            style={{
+              textAlign: 'center'
+            }}
+          >
+            <div 
+              style={{ 
+                fontSize: 'clamp(2.5rem, 10vw, 3.5rem)', 
+                fontFamily: 'monospace', 
+                fontWeight: 'bold', 
+                color: 'white', 
+                textShadow: '0 4px 6px rgba(0, 0, 0, 0.3)',
+                margin: '0 0 0.5rem 0',
+                lineHeight: '1'
               }}
             >
-              音声設定
-            </label>
-            <button
-              onClick={() => setSettings(prev => ({ ...prev, soundEnabled: !prev.soundEnabled }))}
-              style={{
-                width: '100%',
-                padding: '0.5rem',
-                borderRadius: '0.5rem',
-                backgroundColor: settings.soundEnabled 
-                  ? 'rgba(34, 197, 94, 0.3)' 
-                  : 'rgba(239, 68, 68, 0.3)',
-                border: `2px solid ${settings.soundEnabled 
-                  ? 'rgba(34, 197, 94, 0.6)' 
-                  : 'rgba(239, 68, 68, 0.6)'}`,
-                color: 'white',
-                fontSize: '0.9rem',
-                fontWeight: '600',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease-in-out'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-1px)';
-                e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.3)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = 'none';
+              {formatTime(timeLeft)}
+            </div>
+            <div 
+              style={{ 
+                fontSize: 'clamp(0.875rem, 2.5vw, 1rem)', 
+                color: 'rgba(255, 255, 255, 0.9)', 
+                fontWeight: '500',
+                margin: '0'
               }}
             >
-              {settings.soundEnabled ? '🔊 音声ON' : '🔇 音声OFF'}
-            </button>
+              セット: {currentSet}/{settings.setCount}
+            </div>
+          </div>
+
+          {/* プログレスバー */}
+          <div 
+            style={{
+              width: '100%',
+              maxWidth: '300px',
+              padding: '0 1rem'
+            }}
+          >
+            <ProgressBar progress={progress} />
           </div>
         </div>
-      )}
 
-      {/* コントロールボタン */}
-      <div 
-        style={{
-          display: 'flex',
-          gap: '1rem',
-          justifyContent: 'center',
-          flexWrap: 'wrap',
-          padding: '0 1rem',
-          marginBottom: '1rem'
-        }}
-      >
-        <button
-          onClick={isRunning ? pauseTimer : startTimer}
+        {/* 設定 (停止中のみ表示) */}
+        {!isRunning && (
+          <div 
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '0.75rem',
+              width: '100%',
+              maxWidth: '350px',
+              padding: '0 1rem',
+              flex: '0 0 auto'
+            }}
+          >
+            <SettingInput
+              label="ワーク時間"
+              value={settings.workTime}
+              onChange={(value) => setSettings(prev => ({ ...prev, workTime: value }))}
+              min={10}
+              max={300}
+              unit="秒"
+              step={5}
+            />
+            <SettingInput
+              label="レスト時間"
+              value={settings.restTime}
+              onChange={(value) => setSettings(prev => ({ ...prev, restTime: value }))}
+              min={5}
+              max={180}
+              unit="秒"
+              step={5}
+            />
+            <SettingInput
+              label="セット数"
+              value={settings.setCount}
+              onChange={(value) => setSettings(prev => ({ ...prev, setCount: value }))}
+              min={1}
+              max={20}
+              unit="セット"
+              step={1}
+            />
+            
+            {/* 音声設定 */}
+            <div 
+              style={{
+                backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                padding: '0.75rem',
+                borderRadius: '0.5rem',
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)',
+                border: '1px solid rgba(255, 255, 255, 0.3)',
+                backdropFilter: 'blur(10px)'
+              }}
+            >
+              <label 
+                style={{
+                  display: 'block',
+                  fontSize: '0.875rem',
+                  marginBottom: '0.5rem',
+                  fontWeight: '600',
+                  color: 'white',
+                  letterSpacing: '0.025em'
+                }}
+              >
+                音声設定
+              </label>
+              <button
+                onClick={() => setSettings(prev => ({ ...prev, soundEnabled: !prev.soundEnabled }))}
+                style={{
+                  width: '100%',
+                  padding: '0.375rem',
+                  borderRadius: '0.375rem',
+                  backgroundColor: settings.soundEnabled 
+                    ? 'rgba(34, 197, 94, 0.3)' 
+                    : 'rgba(239, 68, 68, 0.3)',
+                  border: `2px solid ${settings.soundEnabled 
+                    ? 'rgba(34, 197, 94, 0.6)' 
+                    : 'rgba(239, 68, 68, 0.6)'}`,
+                  color: 'white',
+                  fontSize: '0.8rem',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease-in-out'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-1px)';
+                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.3)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = 'none';
+                }}
+              >
+                {settings.soundEnabled ? '🔊 音声ON' : '🔇 音声OFF'}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* コントロールボタン */}
+        <div 
           style={{
-            padding: '0.75rem 2rem',
-            borderRadius: '50px',
-            fontWeight: '600',
-            fontSize: '1rem',
-            color: 'white',
-            background: isRunning 
-              ? 'linear-gradient(135deg, rgba(239, 68, 68, 0.9) 0%, rgba(220, 38, 38, 0.9) 100%)'
-              : 'linear-gradient(135deg, rgba(34, 197, 94, 0.9) 0%, rgba(22, 163, 74, 0.9) 100%)',
-            border: 'none',
-            cursor: 'pointer',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
-            transition: 'all 0.3s ease-in-out',
-            minWidth: '120px',
-            letterSpacing: '0.025em'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'translateY(-2px)';
-            e.currentTarget.style.boxShadow = '0 6px 16px rgba(0, 0, 0, 0.4)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'translateY(0)';
-            e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.3)';
+            display: 'flex',
+            gap: '1rem',
+            justifyContent: 'center',
+            flexWrap: 'wrap',
+            padding: '0 1rem',
+            flex: '0 0 auto',
+            marginTop: '1rem'
           }}
         >
-          {isRunning ? '一時停止' : 'スタート'}
-        </button>
-        
-        <button
-          onClick={resetTimer}
-          style={{
-            padding: '0.75rem 2rem',
-            borderRadius: '50px',
-            fontWeight: '600',
-            fontSize: '1rem',
-            color: 'white',
-            background: 'linear-gradient(135deg, rgba(107, 114, 128, 0.9) 0%, rgba(75, 85, 99, 0.9) 100%)',
-            border: 'none',
-            cursor: 'pointer',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
-            transition: 'all 0.3s ease-in-out',
-            minWidth: '120px',
-            letterSpacing: '0.025em'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'translateY(-2px)';
-            e.currentTarget.style.boxShadow = '0 6px 16px rgba(0, 0, 0, 0.4)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'translateY(0)';
-            e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.3)';
-          }}
-        >
-          リセット
-        </button>
+          <button
+            onClick={isRunning ? pauseTimer : startTimer}
+            style={{
+              padding: '0.625rem 1.5rem',
+              borderRadius: '50px',
+              fontWeight: '600',
+              fontSize: '0.875rem',
+              color: 'white',
+              background: isRunning 
+                ? 'linear-gradient(135deg, rgba(239, 68, 68, 0.9) 0%, rgba(220, 38, 38, 0.9) 100%)'
+                : 'linear-gradient(135deg, rgba(34, 197, 94, 0.9) 0%, rgba(22, 163, 74, 0.9) 100%)',
+              border: 'none',
+              cursor: 'pointer',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
+              transition: 'all 0.3s ease-in-out',
+              minWidth: '100px',
+              letterSpacing: '0.025em'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow = '0 6px 16px rgba(0, 0, 0, 0.4)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.3)';
+            }}
+          >
+            {isRunning ? '一時停止' : 'スタート'}
+          </button>
+          
+          <button
+            onClick={resetTimer}
+            style={{
+              padding: '0.625rem 1.5rem',
+              borderRadius: '50px',
+              fontWeight: '600',
+              fontSize: '0.875rem',
+              color: 'white',
+              background: 'linear-gradient(135deg, rgba(107, 114, 128, 0.9) 0%, rgba(75, 85, 99, 0.9) 100%)',
+              border: 'none',
+              cursor: 'pointer',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
+              transition: 'all 0.3s ease-in-out',
+              minWidth: '100px',
+              letterSpacing: '0.025em'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow = '0 6px 16px rgba(0, 0, 0, 0.4)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.3)';
+            }}
+          >
+            リセット
+          </button>
+        </div>
       </div>
     </div>
   );
