@@ -181,11 +181,11 @@ export default function Timer() {
   const progress = (currentTime / (isResting ? settings.intervalTime : settings.setTime)) * 100;
 
   return (
-    <div className={`w-full min-h-[100dvh] flex items-center justify-center ${
+    <div className={`w-full min-h-[100vh] flex items-center justify-center ${
       isResting ? 'bg-gradient-to-br from-green-400 to-green-600' : 'bg-gradient-to-br from-red-400 to-red-600'
     } ${isFullscreen ? 'fixed inset-0 z-50' : ''}`}>
-      <div className="w-full max-w-md sm:max-w-lg lg:max-w-xl relative py-4 px-4">
-        <div className="flex flex-col gap-3 sm:gap-4">
+      <div className="w-full h-full max-w-md sm:max-w-lg lg:max-w-xl relative py-4 px-4">
+        <div className="flex flex-col justify-center min-h-[100vh] gap-3 sm:gap-4">
           <div className="text-center text-white">
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight drop-shadow-lg">
               {isResting ? '休憩中' : 'トレーニング中'}
