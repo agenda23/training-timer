@@ -26,16 +26,12 @@ export const PWAStatus = () => {
   const [showStatus, setShowStatus] = useState(false)
   const [mounted, setMounted] = useState(false)
 
-  // マウント状態を管理
   useEffect(() => {
     setMounted(true)
-    console.log('PWAStatus component mounted')
   }, [])
 
   useEffect(() => {
     if (!mounted) return
-
-    console.log('Starting PWA status check...')
     
     const checkPWAStatus = async () => {
       try {
@@ -55,7 +51,7 @@ export const PWAStatus = () => {
           const manifestResponse = await fetch('/manifest.json')
           manifestData = await manifestResponse.json()
         } catch {
-          console.log('Failed to fetch manifest')
+          // エラーは無視
         }
 
         // Service Workerの状態を確認
@@ -84,7 +80,6 @@ export const PWAStatus = () => {
           serviceWorkerStatus
         }
 
-        console.log('PWA Status:', statusData)
         setStatus(statusData)
       } catch (error) {
         console.error('Error checking PWA status:', error)
@@ -95,58 +90,39 @@ export const PWAStatus = () => {
   }, [mounted])
 
   // サーバーサイドレンダリング時は何も表示しない
-  if (!mounted) {
+  if (!mounted || !status) {
     return null
   }
 
-  console.log('Rendering PWAStatus, mounted:', mounted, 'status:', status)
-
   return (
     <>
-      {/* デバッグ用の表示 */}
-      <div
-        style={{
-          position: 'fixed',
-          top: '10px',
-          right: '10px',
-          zIndex: 99999,
-          backgroundColor: '#ff0000',
-          color: 'white',
-          padding: '8px',
-          borderRadius: '4px',
-          fontSize: '12px',
-          fontFamily: 'monospace'
-        }}
-      >
-        PWA Debug: {mounted ? 'Mounted' : 'Not Mounted'}
-      </div>
-
       {/* PWAステータスボタン */}
       <button
-        onClick={() => {
-          console.log('PWA button clicked')
-          setShowStatus(!showStatus)
-        }}
+        onClick={() => setShowStatus(!showStatus)}
         style={{
           position: 'fixed',
-          top: '50px',
-          right: '10px',
-          zIndex: 99998,
+          top: '8px',
+          right: '8px',
+          zIndex: 9999,
           backgroundColor: '#3b82f6',
           color: 'white',
-          fontSize: '14px',
-          padding: '8px 12px',
+          fontSize: '12px',
+          padding: '6px 10px',
           borderRadius: '6px',
           border: 'none',
           cursor: 'pointer',
-          fontWeight: 'bold'
+          fontWeight: '500',
+          opacity: 0.8,
+          transition: 'opacity 0.2s'
         }}
+        onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
+        onMouseLeave={(e) => e.currentTarget.style.opacity = '0.8'}
         title="PWA Status"
       >
-        PWA Status
+        PWA
       </button>
 
-      {showStatus && status && (
+      {showStatus && (
         <div 
           style={{
             position: 'fixed',
@@ -158,7 +134,7 @@ export const PWAStatus = () => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            zIndex: 99997,
+            zIndex: 10000,
             padding: '20px'
           }}
           onClick={() => setShowStatus(false)}
@@ -166,95 +142,123 @@ export const PWAStatus = () => {
           <div 
             style={{
               backgroundColor: 'white',
-              borderRadius: '8px',
+              borderRadius: '12px',
               padding: '24px',
-              maxWidth: '600px',
+              maxWidth: '500px',
               width: '100%',
               maxHeight: '80vh',
               overflowY: 'auto'
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 style={{ fontSize: '20px', fontWeight: 'bold', margin: '0 0 20px 0' }}>PWA診断結果</h3>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+              <h3 style={{ fontSize: '20px', fontWeight: 'bold', margin: 0, color: '#1f2937' }}>PWA診断</h3>
+              <button
+                onClick={() => setShowStatus(false)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  fontSize: '20px',
+                  cursor: 'pointer',
+                  color: '#6b7280',
+                  padding: '4px'
+                }}
+              >
+                ✕
+              </button>
+            </div>
             
-            <div style={{ fontSize: '14px', lineHeight: '1.6' }}>
-              <div style={{ marginBottom: '10px' }}>
-                <strong>HTTPS配信:</strong> {status.isHTTPS ? '✅ Yes' : '❌ No'}
+            <div style={{ fontSize: '14px', lineHeight: '1.6', color: '#374151' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', padding: '8px 0', borderBottom: '1px solid #f3f4f6' }}>
+                <span><strong>HTTPS配信:</strong></span>
+                <span style={{ color: status.isHTTPS ? '#059669' : '#dc2626' }}>
+                  {status.isHTTPS ? '✅ Yes' : '❌ No'}
+                </span>
               </div>
-              <div style={{ marginBottom: '10px' }}>
-                <strong>Service Worker:</strong> {status.hasServiceWorker ? '✅ Yes' : '❌ No'}
+              
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', padding: '8px 0', borderBottom: '1px solid #f3f4f6' }}>
+                <span><strong>Service Worker:</strong></span>
+                <span style={{ color: status.hasServiceWorker ? '#059669' : '#dc2626' }}>
+                  {status.hasServiceWorker ? '✅ Yes' : '❌ No'}
+                </span>
               </div>
-              <div style={{ marginBottom: '10px' }}>
-                <strong>SW Status:</strong> {status.serviceWorkerStatus}
+              
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', padding: '8px 0', borderBottom: '1px solid #f3f4f6' }}>
+                <span><strong>SW Status:</strong></span>
+                <span style={{ fontSize: '12px', color: '#6b7280' }}>
+                  {status.serviceWorkerStatus}
+                </span>
               </div>
-              <div style={{ marginBottom: '10px' }}>
-                <strong>Manifest:</strong> {status.hasManifest ? '✅ Yes' : '❌ No'}
+              
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', padding: '8px 0', borderBottom: '1px solid #f3f4f6' }}>
+                <span><strong>Manifest:</strong></span>
+                <span style={{ color: status.hasManifest ? '#059669' : '#dc2626' }}>
+                  {status.hasManifest ? '✅ Yes' : '❌ No'}
+                </span>
               </div>
-              <div style={{ marginBottom: '10px' }}>
-                <strong>PWAモード:</strong> {status.isPWA ? '✅ PWAとして起動中' : '⚠️ ブラウザモード'}
+              
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', padding: '8px 0', borderBottom: '1px solid #f3f4f6' }}>
+                <span><strong>PWAモード:</strong></span>
+                <span style={{ color: status.isPWA ? '#059669' : '#f59e0b' }}>
+                  {status.isPWA ? '✅ PWAとして起動中' : '⚠️ ブラウザモード'}
+                </span>
               </div>
-              <div style={{ marginBottom: '10px' }}>
-                <strong>インストール可能:</strong> {status.isInstallable ? '✅ Yes' : '⚠️ No'}
+              
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px', padding: '8px 0' }}>
+                <span><strong>インストール可能:</strong></span>
+                <span style={{ color: status.isInstallable ? '#059669' : '#f59e0b' }}>
+                  {status.isInstallable ? '✅ Yes' : '⚠️ No'}
+                </span>
               </div>
 
               {status.manifestData && (
-                <div style={{ marginTop: '20px', padding: '15px', backgroundColor: '#f5f5f5', borderRadius: '6px' }}>
-                  <strong>Manifest設定:</strong><br />
-                  Display: {status.manifestData.display}<br />
-                  Start URL: {status.manifestData.start_url}<br />
-                  Icons: {status.manifestData.icons?.length || 0}個
+                <div style={{ marginTop: '20px', padding: '16px', backgroundColor: '#f9fafb', borderRadius: '8px', border: '1px solid #e5e7eb' }}>
+                  <div style={{ fontSize: '14px', fontWeight: '600', marginBottom: '8px', color: '#374151' }}>Manifest設定:</div>
+                  <div style={{ fontSize: '13px', color: '#6b7280', lineHeight: '1.5' }}>
+                    <div>Display: {status.manifestData.display}</div>
+                    <div>Start URL: {status.manifestData.start_url}</div>
+                    <div>Icons: {status.manifestData.icons?.length || 0}個</div>
+                  </div>
                 </div>
               )}
-              
-              <div style={{ marginTop: '20px', padding: '15px', backgroundColor: '#f0f0f0', borderRadius: '6px' }}>
-                <strong>User Agent:</strong><br />
-                <div style={{ fontSize: '12px', wordBreak: 'break-all' }}>{status.userAgent}</div>
-              </div>
               
               {status.userAgent.includes('iPhone') && (
                 <div style={{ 
                   marginTop: '20px', 
-                  padding: '15px', 
-                  backgroundColor: '#e3f2fd', 
-                  borderRadius: '6px',
-                  border: '1px solid #2196f3'
+                  padding: '16px', 
+                  backgroundColor: '#eff6ff', 
+                  borderRadius: '8px',
+                  border: '1px solid #3b82f6'
                 }}>
-                  <strong>📱 iOS Safari インストール手順:</strong><br />
-                  1. 画面下部の共有ボタン (□↑) をタップ<br />
-                  2. 「ホーム画面に追加」を選択<br />
-                  3. 「追加」をタップ<br />
-                  4. ホーム画面のアイコンから起動
+                  <div style={{ fontSize: '14px', fontWeight: '600', color: '#1e40af', marginBottom: '8px' }}>
+                    📱 iOS Safari インストール手順:
+                  </div>
+                  <div style={{ fontSize: '13px', color: '#1e40af', lineHeight: '1.5' }}>
+                    1. 画面下部の共有ボタン (□↑) をタップ<br />
+                    2. 「ホーム画面に追加」を選択<br />
+                    3. 「追加」をタップ<br />
+                    4. ホーム画面のアイコンから起動
+                  </div>
                 </div>
               )}
 
               {!status.isPWA && status.userAgent.includes('Chrome') && (
                 <div style={{ 
                   marginTop: '20px', 
-                  padding: '15px', 
-                  backgroundColor: '#e8f5e8', 
-                  borderRadius: '6px',
-                  border: '1px solid #4caf50'
+                  padding: '16px', 
+                  backgroundColor: '#f0fdf4', 
+                  borderRadius: '8px',
+                  border: '1px solid #22c55e'
                 }}>
-                  <strong>🌐 Chrome インストール:</strong><br />
-                  アドレスバーの右側にインストールアイコンが表示されます
+                  <div style={{ fontSize: '14px', fontWeight: '600', color: '#166534', marginBottom: '8px' }}>
+                    🌐 Chrome インストール:
+                  </div>
+                  <div style={{ fontSize: '13px', color: '#166534' }}>
+                    アドレスバーの右側にインストールアイコンが表示されます
+                  </div>
                 </div>
               )}
             </div>
-
-            <button
-              onClick={() => setShowStatus(false)}
-              style={{
-                marginTop: '20px',
-                backgroundColor: '#666',
-                color: 'white',
-                padding: '10px 20px',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer'
-              }}
-            >
-              閉じる
-            </button>
           </div>
         </div>
       )}
