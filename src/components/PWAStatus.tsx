@@ -24,8 +24,15 @@ interface SafariNavigator extends Navigator {
 export const PWAStatus = () => {
   const [status, setStatus] = useState<PWAStatus | null>(null)
   const [showStatus, setShowStatus] = useState(false)
+  const [isClient, setIsClient] = useState(false)
 
   useEffect(() => {
+    setIsClient(true)
+  }, [])
+
+  useEffect(() => {
+    if (!isClient) return
+
     const checkPWAStatus = async () => {
       const isHTTPS = location.protocol === 'https:' || location.hostname === 'localhost'
       const hasServiceWorker = 'serviceWorker' in navigator
@@ -72,81 +79,133 @@ export const PWAStatus = () => {
     }
 
     checkPWAStatus()
-  }, [])
+  }, [isClient])
 
-  if (!status) return null
+  if (!isClient || !status) return null
 
   return (
     <>
-      {/* 常に表示するステータスボタン（本番環境でも表示） */}
-      <button
-        onClick={() => setShowStatus(!showStatus)}
-        className="fixed top-2 right-2 z-50 bg-blue-500 text-white text-xs px-2 py-1 rounded opacity-50 hover:opacity-100"
-        title="PWA Status"
+      {/* PWAステータスボタン - より高いz-indexと明確なスタイル */}
+      <div 
+        style={{ 
+          position: 'fixed', 
+          top: '8px', 
+          right: '8px', 
+          zIndex: 9999,
+          pointerEvents: 'auto'
+        }}
       >
-        PWA
-      </button>
+        <button
+          onClick={() => setShowStatus(!showStatus)}
+          style={{
+            backgroundColor: '#3b82f6',
+            color: 'white',
+            fontSize: '12px',
+            padding: '4px 8px',
+            borderRadius: '4px',
+            border: 'none',
+            cursor: 'pointer',
+            opacity: 0.7,
+            transition: 'opacity 0.2s'
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
+          onMouseLeave={(e) => e.currentTarget.style.opacity = '0.7'}
+          title="PWA Status"
+        >
+          PWA
+        </button>
+      </div>
 
       {showStatus && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-lg w-full max-h-96 overflow-y-auto">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-bold text-gray-900 dark:text-white">PWA診断</h3>
+        <div 
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 10000,
+            padding: '16px'
+          }}
+        >
+          <div 
+            style={{
+              backgroundColor: 'white',
+              borderRadius: '8px',
+              padding: '24px',
+              maxWidth: '500px',
+              width: '100%',
+              maxHeight: '80vh',
+              overflowY: 'auto'
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <h3 style={{ fontSize: '18px', fontWeight: 'bold', margin: 0 }}>PWA診断</h3>
               <button
                 onClick={() => setShowStatus(false)}
-                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  fontSize: '18px',
+                  cursor: 'pointer',
+                  color: '#666'
+                }}
               >
                 ✕
               </button>
             </div>
             
-            <div className="space-y-3 text-sm">
-              <div className="flex justify-between">
+            <div style={{ fontSize: '14px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
                 <span>HTTPS配信:</span>
-                <span className={status.isHTTPS ? 'text-green-600' : 'text-red-600'}>
+                <span style={{ color: status.isHTTPS ? '#16a34a' : '#dc2626' }}>
                   {status.isHTTPS ? '✓' : '✗'}
                 </span>
               </div>
               
-              <div className="flex justify-between">
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
                 <span>Service Worker:</span>
-                <span className={status.hasServiceWorker ? 'text-green-600' : 'text-red-600'}>
+                <span style={{ color: status.hasServiceWorker ? '#16a34a' : '#dc2626' }}>
                   {status.hasServiceWorker ? '✓' : '✗'}
                 </span>
               </div>
               
-              <div className="flex justify-between">
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
                 <span>SW Status:</span>
-                <span className="text-xs text-gray-600 dark:text-gray-400">
+                <span style={{ fontSize: '12px', color: '#666' }}>
                   {status.serviceWorkerStatus}
                 </span>
               </div>
               
-              <div className="flex justify-between">
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
                 <span>Manifest:</span>
-                <span className={status.hasManifest ? 'text-green-600' : 'text-red-600'}>
+                <span style={{ color: status.hasManifest ? '#16a34a' : '#dc2626' }}>
                   {status.hasManifest ? '✓' : '✗'}
                 </span>
               </div>
               
-              <div className="flex justify-between">
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
                 <span>PWAモード:</span>
-                <span className={status.isPWA ? 'text-green-600' : 'text-orange-600'}>
+                <span style={{ color: status.isPWA ? '#16a34a' : '#ea580c' }}>
                   {status.isPWA ? '✓ PWAとして起動中' : '- ブラウザモード'}
                 </span>
               </div>
               
-              <div className="flex justify-between">
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
                 <span>インストール可能:</span>
-                <span className={status.isInstallable ? 'text-green-600' : 'text-orange-600'}>
+                <span style={{ color: status.isInstallable ? '#16a34a' : '#ea580c' }}>
                   {status.isInstallable ? '✓' : '-'}
                 </span>
               </div>
 
               {status.manifestData && (
-                <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600">
-                  <div className="text-xs text-gray-600 dark:text-gray-400">
-                    <div className="mb-2">Manifest設定:</div>
+                <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid #e5e7eb' }}>
+                  <div style={{ fontSize: '12px', color: '#666' }}>
+                    <div style={{ marginBottom: '8px' }}>Manifest設定:</div>
                     <div>Display: {status.manifestData.display}</div>
                     <div>Start URL: {status.manifestData.start_url}</div>
                     <div>Icons: {status.manifestData.icons?.length || 0}個</div>
@@ -154,16 +213,21 @@ export const PWAStatus = () => {
                 </div>
               )}
               
-              <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600">
-                <div className="text-xs text-gray-600 dark:text-gray-400">
-                  <div className="mb-2">User Agent:</div>
-                  <div className="break-all">{status.userAgent}</div>
+              <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid #e5e7eb' }}>
+                <div style={{ fontSize: '12px', color: '#666' }}>
+                  <div style={{ marginBottom: '8px' }}>User Agent:</div>
+                  <div style={{ wordBreak: 'break-all' }}>{status.userAgent}</div>
                 </div>
               </div>
               
               {status.userAgent.includes('iPhone') && (
-                <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900 rounded">
-                  <div className="text-xs text-blue-800 dark:text-blue-200">
+                <div style={{ 
+                  marginTop: '16px', 
+                  padding: '12px', 
+                  backgroundColor: '#dbeafe', 
+                  borderRadius: '6px' 
+                }}>
+                  <div style={{ fontSize: '12px', color: '#1e40af' }}>
                     <strong>iOS Safari インストール手順:</strong><br />
                     1. 画面下部の共有ボタン (□↑) をタップ<br />
                     2. 「ホーム画面に追加」を選択<br />
@@ -174,8 +238,13 @@ export const PWAStatus = () => {
               )}
 
               {!status.isPWA && status.userAgent.includes('Chrome') && (
-                <div className="mt-4 p-3 bg-green-50 dark:bg-green-900 rounded">
-                  <div className="text-xs text-green-800 dark:text-green-200">
+                <div style={{ 
+                  marginTop: '16px', 
+                  padding: '12px', 
+                  backgroundColor: '#dcfce7', 
+                  borderRadius: '6px' 
+                }}>
+                  <div style={{ fontSize: '12px', color: '#166534' }}>
                     <strong>Chrome インストール:</strong><br />
                     アドレスバーの右側にインストールアイコンが表示されます
                   </div>
