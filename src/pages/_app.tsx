@@ -14,6 +14,7 @@ export default function App({ Component, pageProps }: AppProps) {
     <div className={inter.className}>
       <Head>
         <title>トレーニングタイマー</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, user-scalable=no" />
       </Head>
       <PWAInstallPrompt />
       <PWAStatus />

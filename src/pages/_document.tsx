@@ -8,7 +8,7 @@ export default function Document() {
         <meta name="application-name" content="トレーニングタイマー" />
         <meta name="description" content="シンプルで使いやすいインターバルトレーニングタイマー" />
         <meta name="theme-color" content="#ef4444" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, user-scalable=no" />
+
         
         {/* PWA設定 */}
         <meta name="mobile-web-app-capable" content="yes" />

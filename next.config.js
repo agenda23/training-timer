@@ -146,7 +146,6 @@ const withPWA = nextPWA({
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  swcMinify: true,
 }
 
 export default withPWA(nextConfig) 
