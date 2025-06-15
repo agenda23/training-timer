@@ -1,37 +1,49 @@
-const sharp = require('sharp');
-const fs = require('fs').promises;
-const path = require('path');
+import sharp from 'sharp';
+import fs from 'fs';
+import path from 'path';
 
-const sizes = [16, 32, 192, 384, 512];
-const inputSvg = path.join(__dirname, '../public/icons/icon.svg');
-const outputDir = path.join(__dirname, '../public/icons');
+const sizes = [16, 32, 72, 96, 128, 144, 152, 192, 384, 512];
+const inputSvg = 'public/icons/icon.svg';
+const outputDir = 'public/icons';
+
+// 出力ディレクトリが存在することを確認
+if (!fs.existsSync(outputDir)) {
+  fs.mkdirSync(outputDir, { recursive: true });
+}
 
 async function generateIcons() {
   try {
-    // SVGファイルを読み込む
-    const svgBuffer = await fs.readFile(inputSvg);
-
-    // 各サイズのアイコンを生成
     for (const size of sizes) {
       const outputPath = path.join(outputDir, `icon-${size}x${size}.png`);
-      await sharp(svgBuffer)
+      
+      await sharp(inputSvg)
         .resize(size, size)
         .png()
         .toFile(outputPath);
       
-      // faviconのエイリアスを作成
-      if (size === 16) {
-        await fs.copyFile(outputPath, path.join(outputDir, 'favicon-16x16.png'));
-      } else if (size === 32) {
-        await fs.copyFile(outputPath, path.join(outputDir, 'favicon-32x32.png'));
-        // 32x32をfavicon.icoとしても使用
-        await fs.copyFile(outputPath, path.join(outputDir, '../favicon.ico'));
-      }
+      console.log(`Generated: ${outputPath}`);
     }
 
-    console.log('アイコンの生成が完了しました！');
+    // favicon用のアイコンも生成
+    await sharp(inputSvg)
+      .resize(16, 16)
+      .png()
+      .toFile(path.join(outputDir, 'favicon-16x16.png'));
+    
+    await sharp(inputSvg)
+      .resize(32, 32)
+      .png()
+      .toFile(path.join(outputDir, 'favicon-32x32.png'));
+
+    // faviconファイルも生成
+    await sharp(inputSvg)
+      .resize(32, 32)
+      .png()
+      .toFile('public/favicon.ico');
+
+    console.log('All icons generated successfully!');
   } catch (error) {
-    console.error('エラーが発生しました:', error);
+    console.error('Error generating icons:', error);
   }
 }
 
