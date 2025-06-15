@@ -8,7 +8,6 @@ const withPWA = nextPWA({
   buildExcludes: [/middleware-manifest\.json$/],
   cacheOnFrontEndNav: true,
   reloadOnOnline: true,
-  swcMinify: true,
   fallbacks: {
     document: '/offline',
   }
@@ -17,6 +16,7 @@ const withPWA = nextPWA({
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  swcMinify: true,
 }
 
 export default withPWA(nextConfig) 
