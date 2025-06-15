@@ -181,9 +181,9 @@ export default function Timer() {
   const progress = (currentTime / (isResting ? settings.intervalTime : settings.setTime)) * 100;
 
   return (
-    <div className={`w-full min-h-[100dvh] flex items-center justify-center ${
+    <div className={`fixed inset-0 w-full h-[100dvh] flex items-center justify-center overflow-hidden ${
       isResting ? 'bg-gradient-to-br from-green-400 to-green-600' : 'bg-gradient-to-br from-red-400 to-red-600'
-    } ${isFullscreen ? 'fixed inset-0 z-50' : ''}`}>
+    } ${isFullscreen ? 'z-50' : ''}`}>
       <div className="w-full h-[85dvh] max-w-md sm:max-w-lg lg:max-w-xl relative px-4">
         <div className="flex flex-col justify-between h-full">
           <div className="text-center text-white pt-4">
