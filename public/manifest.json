@@ -3,6 +3,7 @@
   "short_name": "トレーニングタイマー",
   "description": "シンプルで使いやすいインターバルトレーニングタイマー",
   "start_url": "/",
+  "id": "/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#ffffff",
@@ -12,6 +13,10 @@
   "lang": "ja",
   "dir": "ltr",
   "categories": ["health", "fitness", "sports"],
+  "display_override": ["standalone", "minimal-ui"],
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
   "icons": [
     {
       "src": "/icons/icon-72x72.png",
@@ -67,7 +72,8 @@
       "src": "/icons/icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "form_factor": "narrow"
+      "form_factor": "narrow",
+      "label": "トレーニングタイマーのメイン画面"
     }
   ]
 } 

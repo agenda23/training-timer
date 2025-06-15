@@ -16,6 +16,11 @@ export default function Document() {
         <meta name="theme-color" content="#ef4444" />
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, user-scalable=no" />
 
+        {/* iOS 17.4以降対応の追加メタタグ */}
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-touch-fullscreen" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        
         {/* iOS専用のアイコン設定 */}
         <link rel="apple-touch-icon" sizes="72x72" href="/icons/icon-72x72.png" />
         <link rel="apple-touch-icon" sizes="96x96" href="/icons/icon-96x96.png" />
@@ -33,8 +38,11 @@ export default function Document() {
         <link rel="shortcut icon" href="/favicon.ico" />
 
         {/* iOS専用のスプラッシュスクリーン設定 */}
-        <meta name="apple-mobile-web-app-capable" content="yes" />
         <link rel="apple-touch-startup-image" href="/icons/icon-512x512.png" />
+        
+        {/* iOS 17.4以降のPWA対応 */}
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="mobile-web-app-status-bar-style" content="black-translucent" />
       </Head>
       <body>
         <Main />
