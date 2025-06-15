@@ -270,7 +270,7 @@ export default function Timer() {
             </button>
             <button
               onClick={toggleFullscreen}
-              className="bg-white/90 text-gray-800 rounded-full p-3 hover:bg-white hover:scale-105 transition-all duration-300 shadow-lg backdrop-blur-sm"
+              className="hidden sm:block bg-white/90 text-gray-800 rounded-full p-3 hover:bg-white hover:scale-105 transition-all duration-300 shadow-lg backdrop-blur-sm"
             >
               <ArrowsPointingOutIcon className="h-8 w-8" />
             </button>
