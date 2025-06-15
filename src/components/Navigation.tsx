@@ -10,12 +10,28 @@ export const Navigation = () => {
   const [isPWA, setIsPWA] = useState(false)
 
   useEffect(() => {
+    // クライアントサイドでのみ実行
+    if (typeof window === 'undefined') return
+
     // PWAとして起動されているかどうかを確認
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches
-    const isAppleStandalone = ('standalone' in navigator) && (navigator as SafariNavigator).standalone
-    setIsPWA(isStandalone || !!isAppleStandalone)
+    const checkPWA = () => {
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+      const isAppleStandalone = ('standalone' in navigator) && (navigator as SafariNavigator).standalone
+      setIsPWA(isStandalone || !!isAppleStandalone)
+    }
+
+    checkPWA()
+
+    // display-modeの変更を監視
+    const mediaQuery = window.matchMedia('(display-mode: standalone)')
+    mediaQuery.addEventListener('change', checkPWA)
+
+    return () => {
+      mediaQuery.removeEventListener('change', checkPWA)
+    }
   }, [])
 
+  // PWAでない場合は何も表示しない
   if (!isPWA) return null
 
   const handleRefresh = () => {
