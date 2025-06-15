@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景円 -->
+  <circle cx="256" cy="256" r="256" fill="#EF4444"/>
+  
+  <!-- タイマーの外枠 -->
+  <path d="M256 128C350.039 128 426 203.961 426 298C426 392.039 350.039 468 256 468C161.961 468 86 392.039 86 298C86 203.961 161.961 128 256 128Z" fill="white" fill-opacity="0.9"/>
+  
+  <!-- タイマーの内側 -->
+  <path d="M256 158C333.484 158 396 220.516 396 298C396 375.484 333.484 438 256 438C178.516 438 116 375.484 116 298C116 220.516 178.516 158 256 158Z" fill="#EF4444"/>
+  
+  <!-- 上部のボタン -->
+  <rect x="226" y="44" width="60" height="84" rx="12" fill="white" fill-opacity="0.9"/>
+  
+  <!-- 目盛り -->
+  <rect x="251" y="158" width="10" height="40" fill="white" fill-opacity="0.9"/>
+  <rect x="251" y="398" width="10" height="40" fill="white" fill-opacity="0.9"/>
+  <rect x="398" y="293" width="10" height="40" transform="rotate(90 398 293)" fill="white" fill-opacity="0.9"/>
+  <rect x="158" y="293" width="10" height="40" transform="rotate(90 158 293)" fill="white" fill-opacity="0.9"/>
+  
+  <!-- 針 -->
+  <path d="M256 298L256 188" stroke="white" stroke-width="16" stroke-linecap="round"/>
+  <path d="M256 298L346 298" stroke="white" stroke-width="16" stroke-linecap="round"/>
+  
+  <!-- 中心点 -->
+  <circle cx="256" cy="298" r="16" fill="white" fill-opacity="0.9"/>
+</svg> 
