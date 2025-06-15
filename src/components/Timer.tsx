@@ -148,62 +148,62 @@ export default function Timer() {
     max: number;
     unit?: string;
   }) => (
-    <div className="bg-white/10 p-4 rounded-lg">
-      <label className="block text-sm sm:text-base lg:text-lg mb-2 font-medium">
+    <div className="bg-white/10 p-4 rounded-xl shadow-lg border border-white/20">
+      <label className="block text-sm sm:text-base lg:text-lg mb-2 font-medium text-white tracking-wide">
         {label}
       </label>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-3">
         <input
           type="range"
           value={value}
           onChange={(e) => onChange(parseInt(e.target.value))}
-          className="w-full h-2 bg-white/30 rounded-lg appearance-none cursor-pointer"
+          className="w-full h-2 bg-white/20 rounded-lg appearance-none cursor-pointer accent-white/90"
           min={min}
           max={max}
         />
-        <div className="w-20 flex items-center gap-1">
+        <div className="w-24 flex items-center gap-1 bg-white/10 rounded-lg p-1 backdrop-blur-sm">
           <input
             type="number"
             value={value}
             onChange={(e) => onChange(parseInt(e.target.value) || min)}
-            className="w-14 p-1 rounded text-black text-center"
+            className="w-14 p-1 rounded bg-transparent text-white text-center font-medium"
             min={min}
             max={max}
           />
-          <span className="text-sm">{unit}</span>
+          <span className="text-sm text-white/90">{unit}</span>
         </div>
       </div>
     </div>
   );
 
   return (
-    <div className={`w-full min-h-screen flex items-center justify-center p-4 ${
-      isResting ? 'bg-green-500' : 'bg-red-500'
+    <div className={`w-full min-h-[100dvh] flex items-center justify-center p-4 ${
+      isResting ? 'bg-gradient-to-br from-green-400 to-green-600' : 'bg-gradient-to-br from-red-400 to-red-600'
     } ${isFullscreen ? 'fixed inset-0 z-50' : ''}`}>
-      <div className="w-full max-w-7xl aspect-[4/3] relative">
-        <div className="absolute inset-0 flex flex-col justify-between p-4 sm:p-8">
+      <div className="w-full max-w-7xl aspect-[3/4] sm:aspect-[4/3] relative">
+        <div className="absolute inset-0 flex flex-col justify-between p-4 sm:p-6">
           <div className="flex-none text-center text-white">
-            <h1 className="text-2xl sm:text-4xl lg:text-6xl font-bold">
+            <h1 className="text-2xl sm:text-4xl lg:text-6xl font-bold tracking-tight drop-shadow-lg">
               {isResting ? '休憩中' : 'トレーニング中'}
             </h1>
           </div>
-          <div className="flex-1 flex flex-col justify-center items-center gap-4 sm:gap-6 lg:gap-8 my-4">
-            <div className="text-4xl sm:text-6xl lg:text-8xl font-mono text-white">
+          <div className="flex-1 flex flex-col justify-center items-center gap-4 sm:gap-6 lg:gap-8 my-2 sm:my-4">
+            <div className="text-4xl sm:text-6xl lg:text-8xl font-mono text-white font-bold tracking-wider drop-shadow-lg">
               {formatTime(currentTime)}
             </div>
-            <div className="text-xl sm:text-2xl lg:text-4xl text-white">
+            <div className="text-xl sm:text-2xl lg:text-4xl text-white font-medium tracking-wide drop-shadow-lg">
               セット: {currentSet}/{settings.setCount}
             </div>
-            <div className="w-full max-w-4xl bg-white/30 rounded-full h-3 sm:h-4 lg:h-6">
+            <div className="w-full max-w-4xl bg-white/20 rounded-full h-3 sm:h-4 lg:h-6 backdrop-blur-sm shadow-lg">
               <div
-                className="bg-white h-full rounded-full transition-all duration-1000"
+                className="bg-white/90 h-full rounded-full transition-all duration-1000 shadow-inner"
                 style={{ width: `${progress}%` }}
               />
             </div>
           </div>
           {!isRunning ? (
             <div className="flex-none w-full max-w-2xl mx-auto">
-              <div className="bg-black/20 p-4 sm:p-6 rounded-xl backdrop-blur-sm space-y-3 sm:space-y-4">
+              <div className="bg-white/10 p-4 sm:p-6 rounded-2xl backdrop-blur-md shadow-xl space-y-3 sm:space-y-4 border border-white/20">
                 <SettingInput
                   label="セット時間"
                   value={settings.setTime}
@@ -228,17 +228,17 @@ export default function Timer() {
                 />
                 <button
                   onClick={() => setSettings({ ...settings, soundEnabled: !settings.soundEnabled })}
-                  className="w-full bg-white/10 p-3 rounded-lg flex items-center justify-center gap-2 hover:bg-white/20 transition-colors text-white"
+                  className="w-full bg-white/10 p-3 rounded-xl flex items-center justify-center gap-2 hover:bg-white/20 transition-all duration-300 text-white border border-white/20 shadow-lg"
                 >
                   {settings.soundEnabled ? (
                     <>
                       <SpeakerWaveIcon className="h-5 w-5" />
-                      <span className="text-sm sm:text-base">サウンドON</span>
+                      <span className="text-sm sm:text-base font-medium">サウンドON</span>
                     </>
                   ) : (
                     <>
                       <SpeakerXMarkIcon className="h-5 w-5" />
-                      <span className="text-sm sm:text-base">サウンドOFF</span>
+                      <span className="text-sm sm:text-base font-medium">サウンドOFF</span>
                     </>
                   )}
                 </button>
@@ -248,7 +248,7 @@ export default function Timer() {
           <div className="flex-none flex justify-center space-x-4 mt-4">
             <button
               onClick={isRunning ? pauseTimer : startTimer}
-              className="bg-white text-gray-800 rounded-full p-3 sm:p-4 hover:bg-gray-100 transition-colors"
+              className="bg-white/90 text-gray-800 rounded-full p-3 sm:p-4 hover:bg-white hover:scale-105 transition-all duration-300 shadow-lg backdrop-blur-sm"
             >
               {isRunning && !isPaused ? (
                 <PauseIcon className="h-6 w-6 sm:h-8 sm:w-8 lg:h-10 lg:w-10" />
@@ -258,13 +258,13 @@ export default function Timer() {
             </button>
             <button
               onClick={resetTimer}
-              className="bg-white text-gray-800 rounded-full p-3 sm:p-4 hover:bg-gray-100 transition-colors"
+              className="bg-white/90 text-gray-800 rounded-full p-3 sm:p-4 hover:bg-white hover:scale-105 transition-all duration-300 shadow-lg backdrop-blur-sm"
             >
               <ArrowPathIcon className="h-6 w-6 sm:h-8 sm:w-8 lg:h-10 lg:w-10" />
             </button>
             <button
               onClick={toggleFullscreen}
-              className="bg-white text-gray-800 rounded-full p-3 sm:p-4 hover:bg-gray-100 transition-colors"
+              className="bg-white/90 text-gray-800 rounded-full p-3 sm:p-4 hover:bg-white hover:scale-105 transition-all duration-300 shadow-lg backdrop-blur-sm"
             >
               <ArrowsPointingOutIcon className="h-6 w-6 sm:h-8 sm:w-8 lg:h-10 lg:w-10" />
             </button>
